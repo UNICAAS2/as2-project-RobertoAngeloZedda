@@ -7,21 +7,21 @@ class TrapezoidalMap {
     private:
         std::vector<Trapezoid> trapezoids;
 
-        void updateTrapezoid(const size_t index, const Trapezoid& trapezoid);
-
-        void split4(const size_t trpzToReplace, const cg3::Segment2d& segment);
-        void split3Left(const size_t trpzToReplace, const cg3::Segment2d& segment);
-        void split2MergeTop(const size_t trpzToReplace, const cg3::Segment2d& segment, const size_t trpzToMerge, const size_t trpzNB);
-        void split2MergeBot(const size_t trpzToReplace, const cg3::Segment2d& segment, const size_t trpzToMerge, const size_t trpzNB);
-        void split3RightMergeTop(const size_t trpzToReplace, const cg3::Segment2d& segment, const size_t trpzToMerge, const size_t trpzNB);
-        void split3RightMergeBot(const size_t trpzToReplace, const cg3::Segment2d& segment, const size_t trpezToMerge, const size_t trpzNB);
-    public:
-        TrapezoidalMap();
-        ~TrapezoidalMap();
-
         size_t addTrapezoid(const Trapezoid& trapezoid);
 
-        void updateTrapezoidalMap(const size_t startTrpz, const cg3::Segment2d& segment);
+        void updateTrapezoid(const size_t index, const Trapezoid& trapezoid);
+    public:
+        TrapezoidalMap(const Trapezoid& trapezoid);
+        ~TrapezoidalMap();
+
+        const Trapezoid& getTrapezoid(const size_t index) const;
+
+        const std::vector<size_t> split4(const size_t trpzToReplace, const cg3::Segment2d& segment);
+        const std::vector<size_t> split3(const size_t trpzToReplace, const cg3::Segment2d& segment);
+        const std::vector<size_t> split2MergeTop(const size_t trpzToReplace, const cg3::Segment2d& segment, const size_t trpzToMerge, const size_t trpzNB);
+        const std::vector<size_t> split2MergeBot(const size_t trpzToReplace, const cg3::Segment2d& segment, const size_t trpzToMerge, const size_t trpzNB);
+        const std::vector<size_t> split3MergeTop(const size_t trpzToReplace, const cg3::Segment2d& segment, const size_t trpzToMerge, const size_t trpzNB);
+        const std::vector<size_t> split3MergeBot(const size_t trpzToReplace, const cg3::Segment2d& segment, const size_t trpezToMerge, const size_t trpzNB);
 };
 
 #endif // TRAPEZOIDALMAP_H

@@ -6,10 +6,10 @@ Trapezoid::Trapezoid() {
     leftP = cg3::Point2d(0, 0);
     rightP = cg3::Point2d(0, 0);
 
-    topLeftNeighbor = 0;
-    topRightNeighbor = 0;
-    botLeftNeighbor = 0;
-    botRightNeighbor = 0;
+    topLeftNeighbor = SIZE_MAX;
+    topRightNeighbor = SIZE_MAX;
+    botLeftNeighbor = SIZE_MAX;
+    botRightNeighbor = SIZE_MAX;
 }
 
 Trapezoid::Trapezoid(const cg3::Segment2d &top, const cg3::Segment2d &bot, const cg3::Point2d &leftP, const cg3::Point2d &rightP) {
@@ -17,6 +17,23 @@ Trapezoid::Trapezoid(const cg3::Segment2d &top, const cg3::Segment2d &bot, const
     this->bot = bot;
     this->leftP = leftP;
     this->rightP = rightP;
+
+    topLeftNeighbor = SIZE_MAX;
+    topRightNeighbor = SIZE_MAX;
+    botLeftNeighbor = SIZE_MAX;
+    botRightNeighbor = SIZE_MAX;
+}
+
+Trapezoid::Trapezoid(const Trapezoid& trapezoid) {
+    this->top = trapezoid.getTop();
+    this->bot = trapezoid.getBot();
+    this->leftP = trapezoid.getLeftP();
+    this->rightP = trapezoid.getRightP();
+
+    topLeftNeighbor = SIZE_MAX;
+    topRightNeighbor = SIZE_MAX;
+    botLeftNeighbor = SIZE_MAX;
+    botRightNeighbor = SIZE_MAX;
 }
 
 Trapezoid::~Trapezoid() {

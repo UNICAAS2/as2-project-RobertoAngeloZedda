@@ -18,6 +18,7 @@ class Trapezoid {
     public:
         Trapezoid();
         Trapezoid(const cg3::Segment2d& top, const cg3::Segment2d& bot, const cg3::Point2d& leftP, const cg3::Point2d& rightP);
+        Trapezoid(const Trapezoid& trapezoid);
         ~Trapezoid();
 
         void setTop(const cg3::Segment2d& segment);
