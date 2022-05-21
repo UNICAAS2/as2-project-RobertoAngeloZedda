@@ -4,6 +4,14 @@
 #include <cg3/geometry/segment2.h>
 #include <cg3/geometry/point2.h>
 
+/**
+ * @brief Base element of the TrapezoidalMap.
+ * A Trapezoid is represented by two segments describing its upper and lower boundaries
+ * and two points to describe its left and right boundaries.
+ * A Trapezoid can also have up to four neighbors:
+ * topLeft, topRight, botLeft, botRight.
+ * They are represented with the index they have inside the TrapezoidalMap's vector.
+ */
 class Trapezoid {
     private:
         cg3::Segment2d top;
@@ -17,7 +25,8 @@ class Trapezoid {
         size_t botRightNeighbor;
     public:
         Trapezoid();
-        Trapezoid(const cg3::Segment2d& top, const cg3::Segment2d& bot, const cg3::Point2d& leftP, const cg3::Point2d& rightP);
+        Trapezoid(const cg3::Segment2d& top, const cg3::Segment2d& bot,
+                  const cg3::Point2d& leftP, const cg3::Point2d& rightP);
         Trapezoid(const Trapezoid& trapezoid);
         ~Trapezoid();
 

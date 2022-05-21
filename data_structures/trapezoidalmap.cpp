@@ -1,28 +1,66 @@
 #include "trapezoidalmap.h"
 
+/**
+ * @brief TrapezoidalMap Constructor
+ * @param boundingBox, first Trapezoid
+ */
 TrapezoidalMap::TrapezoidalMap(const Trapezoid& boundingBox) {
     trapezoids = std::vector<Trapezoid>();
     trapezoids.push_back(boundingBox);
 }
 
+/**
+ * @brief TrapezoidalMap deconstructor
+ */
 TrapezoidalMap::~TrapezoidalMap() {
     trapezoids.~vector();
 }
 
+/**
+ * @brief Adds a Trapezoid to the vector and returns the index in which it has been inserted
+ * @param trapezoid, the Trapezoid to insert
+ * @return The index in which the Trapezoid has been inserted
+ */
 size_t TrapezoidalMap::addTrapezoid(const Trapezoid& trapezoid) {
     trapezoids.push_back(trapezoid);
-    return trapezoids.size();
+    return trapezoids.size()-1;
 }
 
+/**
+ * @brief Replaces the Trapezoid located in the index position with a new one
+ * @param index, index of the Trapezoid to replace
+ * @param trapezoid, new Trapezoid
+ */
 void TrapezoidalMap::updateTrapezoid(const size_t index, const Trapezoid& trapezoid) {
     trapezoids[index].~Trapezoid();
     trapezoids[index] = trapezoid;
 }
 
+/**
+ * @brief Returns the Trapezoid located in the index position
+ * @param index, index of the Trapezoid to return
+ * @return the Trapezoid in the index position
+ */
 const Trapezoid& TrapezoidalMap::getTrapezoid(const size_t index) const {
     return trapezoids[index];
 }
 
+/**
+ * @brief Splits the Trapezoid in 4 new Trapezoids.
+ * When a new Segment is being inserted into the TrapezoidalMap
+ * and it is fully contained inside a single Trapezoid,
+ * that Trapezoid has to be splitted in 4 new Trapezoids.
+ *
+ * This metod performs this type of split.
+ *
+ * The first Trapezoid, the left most one, will keep the same index
+ * of the Trapezoid that is being replaced.
+ *
+ * All the neighbors will also be updated.
+ * @param trpzToReplace, index of the Trapezoid to replace
+ * @param segment, Segment to compute the spit around
+ * @return a Vector containing the 4 indexes of the new Trapezoids
+ */
 const std::vector<size_t> TrapezoidalMap::split4(const size_t trpzToReplace, const cg3::Segment2d& segment) {
     /* Reference of the Trapezoid that needs to be splitted */
     Trapezoid origin = trapezoids[trpzToReplace];
@@ -79,6 +117,26 @@ const std::vector<size_t> TrapezoidalMap::split4(const size_t trpzToReplace, con
     return createdTrapezoids;
 }
 
+/**
+ * @brief Splits the Trapezoid in 3 new Trapezoids.
+ * When a new Segment is being inserted into the TrapezoidalMap
+ * and it is contained inside multiple Trapezoids,
+ * those Trapezoids need to be splitted.
+ * The first Trapezoid has to be splitted in 3 new Trapezoids.
+ *
+ * This metod performs this type of split.
+ *
+ * The first Trapezoid, the left most one, will keep the same index
+ * of the Trapezoid that is being replaced.
+ *
+ * The neighbors will also be updated
+ * excluding the internal right ones
+ * since they need to be handled by the method
+ * that performs the split of the "next" Trapezoid.
+ * @param trpzToReplace, index of the Trapezoid to replace
+ * @param segment, Segment to compute the spit around
+ * @return a Vector containing the 3 indexes of the new Trapezoids
+ */
 const std::vector<size_t> TrapezoidalMap::split3(const size_t trpzToReplace, const cg3::Segment2d& segment) {
     /* Reference of the Trapezoid that needs to be splitted */
     Trapezoid origin = trapezoids[trpzToReplace];
@@ -120,7 +178,34 @@ const std::vector<size_t> TrapezoidalMap::split3(const size_t trpzToReplace, con
     return createdTrapezoids;
 }
 
-const std::vector<size_t> TrapezoidalMap::split2MergeTop(const size_t trpzToReplace, const cg3::Segment2d& segment, const size_t trpzToMerge, const size_t trpzNB) {
+/**
+ * @brief Splits the Trapezoid in 2 new Trapezoids merging the top one.
+ * When a new Segment is being inserted into the TrapezoidalMap
+ * and it is contained inside multiple Trapezoids,
+ * those Trapezoids need to be splitted.
+ * Trapezoids not in first nor last position need to be splitted in 2 new Trapezoids
+ * and, if the segment is passing through the top right neighbor
+ * of the previous Trapezoid it needs to be merged.
+ *
+ * This metod performs this type of split.
+ *
+ * The first Trapezoid, the upper one, will keep the same index
+ * of the Trapezoid that is being merged.
+ * The second one, the lower one, will keep the same index
+ * of the Trapezoid that is being replaced.
+ *
+ * The neighbors will also be updated
+ * excluding the internal right ones
+ * since they need to be handled by the method
+ * that performs the split of the "next" Trapezoid.
+ * @param trpzToReplace, index of the Trapezoid to replace
+ * @param segment, Segment to compute the spit around
+ * @param trpzToMerge, index of the Trapezoid to merge
+ * @param trpzNB, index of the other Trapezoid from the previous split (used to update neighbors)
+ * @return a Vector containing the 2 indexes of the new Trapezoids
+ */
+const std::vector<size_t> TrapezoidalMap::split2MergeTop(const size_t trpzToReplace, const cg3::Segment2d& segment,
+                                                         const size_t trpzToMerge, const size_t trpzNB) {
     /* Reference of the Trapezoid that needs to be splitted */
     Trapezoid origin = trapezoids[trpzToReplace];
     /* Reference of the Trapezoid that needs to be merged */
@@ -153,7 +238,34 @@ const std::vector<size_t> TrapezoidalMap::split2MergeTop(const size_t trpzToRepl
     return createdTrapezoids;
 }
 
-const std::vector<size_t> TrapezoidalMap::split2MergeBot(const size_t trpzToReplace, const cg3::Segment2d& segment, const size_t trpzToMerge, const size_t trpzNB) {
+/**
+ * @brief Splits the Trapezoid in 2 new Trapezoids merging the bottom one.
+ * When a new Segment is being inserted into the TrapezoidalMap
+ * and it is contained inside multiple Trapezoids,
+ * those Trapezoids need to be splitted.
+ * Trapezoids not in first nor last position need to be splitted in 2 new Trapezoids
+ * and, if the segment is passing through the bottom right neighbor
+ * of the previous Trapezoid it needs to be merged.
+ *
+ * This metod performs this type of split.
+ *
+ * The first Trapezoid, the upper one, will keep the same index
+ * of the Trapezoid that is being replaced.
+ * The second one, the lower one, will keep the same index
+ * of the Trapezoid that is being merged.
+ *
+ * The neighbors will also be updated
+ * excluding the internal right ones
+ * since they need to be handled by the method
+ * that performs the split of the "next" Trapezoid.
+ * @param trpzToReplace, index of the Trapezoid to replace
+ * @param segment, Segment to compute the spit around
+ * @param trpzToMerge, index of the Trapezoid to merge
+ * @param trpzNB, index of the other Trapezoid from the previous split (used to update neighbors)
+ * @return a Vector containing the 2 indexes of the new Trapezoids
+ */
+const std::vector<size_t> TrapezoidalMap::split2MergeBot(const size_t trpzToReplace, const cg3::Segment2d& segment,
+                                                         const size_t trpzToMerge, const size_t trpzNB) {
     /* Reference of the Trapezoid that needs to be splitted */
     Trapezoid origin = trapezoids[trpzToReplace];
     /* Reference of the Trapezoid that needs to be merged */
@@ -186,7 +298,31 @@ const std::vector<size_t> TrapezoidalMap::split2MergeBot(const size_t trpzToRepl
     return createdTrapezoids;
 }
 
-const std::vector<size_t> TrapezoidalMap::split3MergeTop(const size_t trpzToReplace, const cg3::Segment2d& segment, const size_t trpzToMerge, const size_t trpzNB) {
+/**
+ * @brief Splits the Trapezoid in 3 new Trapezoids merging the top one.
+ * When a new Segment is being inserted into the TrapezoidalMap
+ * and it is contained inside multiple Trapezoids,
+ * those Trapezoids need to be splitted.
+ * The last Trapezoid needs to be splitted in 3 new Trapezoids
+ * and, if the segment is passing through the top right neighbor
+ * of the previous Trapezoid it needs to be merged.
+ *
+ * This metod performs this type of split.
+ *
+ * The first Trapezoid, the upper one, will keep the same index
+ * of the Trapezoid that is being merged.
+ * The third one, the right most one, will keep the same index
+ * of the Trapezoid that is being replaced.
+ *
+ * All neighbors will also be updated.
+ * @param trpzToReplace, index of the Trapezoid to replace
+ * @param segment, Segment to compute the spit around
+ * @param trpzToMerge, index of the Trapezoid to merge
+ * @param trpzNB, index of the other Trapezoid from the previous split (used to update neighbors)
+ * @return a Vector containing the 3 indexes of the new Trapezoids
+ */
+const std::vector<size_t> TrapezoidalMap::split3MergeTop(const size_t trpzToReplace, const cg3::Segment2d& segment,
+                                                         const size_t trpzToMerge, const size_t trpzNB) {
     /* Reference of the Trapezoid that needs to be splitted */
     Trapezoid origin = trapezoids[trpzToReplace];
     /* Reference of the Trapezoid that needs to be merged */
@@ -236,7 +372,31 @@ const std::vector<size_t> TrapezoidalMap::split3MergeTop(const size_t trpzToRepl
     return createdTrapezoids;
 }
 
-const std::vector<size_t> TrapezoidalMap::split3MergeBot(const size_t trpzToReplace, const cg3::Segment2d& segment, const size_t trpzToMerge, const size_t trpzNB) {
+/**
+ * @brief Splits the Trapezoid in 3 new Trapezoids merging the bottom one.
+ * When a new Segment is being inserted into the TrapezoidalMap
+ * and it is contained inside multiple Trapezoids,
+ * those Trapezoids need to be splitted.
+ * The last Trapezoid needs to be splitted in 3 new Trapezoids
+ * and, if the segment is passing through the bottom right neighbor
+ * of the previous Trapezoid it needs to be merged.
+ *
+ * This metod performs this type of split.
+ *
+ * The second Trapezoid, the lower one, will keep the same index
+ * of the Trapezoid that is being merged.
+ * The third one, the right most one, will keep the same index
+ * of the Trapezoid that is being replaced.
+ *
+ * All neighbors will also be updated.
+ * @param trpzToReplace, index of the Trapezoid to replace
+ * @param segment, Segment to compute the spit around
+ * @param trpzToMerge, index of the Trapezoid to merge
+ * @param trpzNB, index of the other Trapezoid from the previous split (used to update neighbors)
+ * @return a Vector containing the 3 indexes of the new Trapezoids
+ */
+const std::vector<size_t> TrapezoidalMap::split3MergeBot(const size_t trpzToReplace, const cg3::Segment2d& segment,
+                                                         const size_t trpzToMerge, const size_t trpzNB) {
     /* Reference of the Trapezoid that needs to be splitted */
     Trapezoid origin = trapezoids[trpzToReplace];
     /* Reference of the Trapezoid that needs to be merged */
