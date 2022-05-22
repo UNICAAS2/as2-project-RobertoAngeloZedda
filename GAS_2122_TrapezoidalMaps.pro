@@ -40,6 +40,7 @@ DISTFILES += \
     LICENSE
 
 SOURCES +=  \
+    data_structures/dag.cpp \
     data_structures/dagnode.cpp \
     data_structures/segment_intersection_checker.cpp \
     data_structures/trapezoid.cpp \
@@ -54,6 +55,7 @@ FORMS += \
     managers/trapezoidalmapmanager.ui
 
 HEADERS += \
+    data_structures/dag.h \
     data_structures/dagnode.h \
     data_structures/segment_intersection_checker.h \
     data_structures/trapezoid.h \
