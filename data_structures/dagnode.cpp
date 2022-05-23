@@ -1,5 +1,15 @@
 #include "dagnode.h"
 
+DAGnode::DAGnode() {
+    this->left = SIZE_MAX;
+    this->right = SIZE_MAX;
+}
+
+DAGnode::DAGnode(const size_t left, const size_t right) {
+    this->left = left;
+    this->right = right;
+}
+
 void DAGnode::setLeft(const size_t leftNode) {
     left = leftNode;
 }
@@ -16,11 +26,15 @@ size_t DAGnode::getRight() const {
     return right;
 }
 
+DAGnodePoint::DAGnodePoint(const cg3::Point2d& point) {
+    DAGnode();
+    value = point;
+}
+
 DAGnodePoint::DAGnodePoint(const cg3::Point2d& point,
                            const size_t left, const size_t right) {
+    DAGnode(left, right);
     value = point;
-    this->setLeft(left);
-    this->setRight(right);
 }
 
 void DAGnodePoint::setValue(const cg3::Point2d& point) {
@@ -31,11 +45,15 @@ const cg3::Point2d& DAGnodePoint::getValue() const {
     return value;
 }
 
-DAGnodeSegment::DAGnodeSegment(const cg3::Segment2d& segment,
-                             const size_t left, const size_t right) {
+DAGnodeSegment::DAGnodeSegment(const cg3::Segment2d& segment) {
+    DAGnode();
     this->value = segment;
-    this->setLeft(left);
-    this->setRight(right);
+}
+
+DAGnodeSegment::DAGnodeSegment(const cg3::Segment2d& segment,
+                               const size_t left, const size_t right) {
+    DAGnode(left, right);
+    this->value = segment;
 }
 
 void DAGnodeSegment::setValue(const cg3::Segment2d& segment) {
@@ -46,11 +64,15 @@ const cg3::Segment2d& DAGnodeSegment::getValue() const {
     return value;
 }
 
-DAGnodeTrapezoid::DAGnodeTrapezoid(const size_t trapezoid,
-                               const size_t left, const size_t right) {
+DAGnodeTrapezoid::DAGnodeTrapezoid(const size_t trapezoid) {
+    DAGnode();
     this->value = trapezoid;
-    this->setLeft(left);
-    this->setRight(right);
+}
+
+DAGnodeTrapezoid::DAGnodeTrapezoid(const size_t trapezoid,
+                                   const size_t left, const size_t right) {
+    DAGnode(left, right);
+    this->value = trapezoid;
 }
 
 void DAGnodeTrapezoid::setValue(const size_t trapezoid) {
