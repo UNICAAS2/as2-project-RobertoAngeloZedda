@@ -16,7 +16,8 @@ const DAGnode& DAG::getNode(const size_t index) const {
 
 void DAG::updateNode(DAGnode& newNode, const size_t index) {
     if (dynamic_cast<DAGnodePoint*>(&(nodes[index])) != nullptr) {
-        nodes[index].~DAGnodePoint();
+        DAGnodePoint* ptr = dynamic_cast<DAGnodePoint*>(&(nodes[index]));
+        ptr->~DAGnodePoint();
         nodes[index] = newNode;
     }
 }
