@@ -27,18 +27,16 @@ class Trapezoid {
         Trapezoid();
         Trapezoid(const cg3::Segment2d& top, const cg3::Segment2d& bot,
                   const cg3::Point2d& leftP, const cg3::Point2d& rightP);
-        Trapezoid(const Trapezoid& trapezoid);
-        ~Trapezoid();
 
         void setTop(const cg3::Segment2d& segment);
         void setBot(const cg3::Segment2d& segment);
         void setLeftP(const cg3::Point2d& point);
         void setRightP(const cg3::Point2d& point);
 
-        void setTopLeftNeighbor(const size_t trapezoid);
-        void setTopRightNeighbor(const size_t trapezoid);
-        void setBotLeftNeighbor(const size_t trapezoid);
-        void setBotRightNeighbor(const size_t trapezoid);
+        void setTopLeftNeighbor(const size_t& trapezoid);
+        void setTopRightNeighbor(const size_t& trapezoid);
+        void setBotLeftNeighbor(const size_t& trapezoid);
+        void setBotRightNeighbor(const size_t& trapezoid);
 
         const cg3::Segment2d& getTop() const;
         const cg3::Segment2d& getBot() const;

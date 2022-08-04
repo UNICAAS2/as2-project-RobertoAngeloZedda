@@ -36,32 +36,6 @@ Trapezoid::Trapezoid(const cg3::Segment2d &top, const cg3::Segment2d &bot,
 }
 
 /**
- * @brief Trapezoid Copy Constructor
- * @param trapezoid, Trapezoid to copy from
- */
-Trapezoid::Trapezoid(const Trapezoid& trapezoid) {
-    this->top = trapezoid.getTop();
-    this->bot = trapezoid.getBot();
-    this->leftP = trapezoid.getLeftP();
-    this->rightP = trapezoid.getRightP();
-
-    this->topLeftNeighbor = trapezoid.getTopLeftNeighbor();
-    this->topRightNeighbor = trapezoid.getTopRightNeighbor();
-    this->botLeftNeighbor = trapezoid.getBotLeftNeighbor();
-    this->botRightNeighbor = trapezoid.getTopRightNeighbor();
-}
-
-/**
- * @brief Trapezoid deconstuctor
- */
-Trapezoid::~Trapezoid() {
-    top.~Segment();
-    bot.~Segment();
-    leftP.~Point2();
-    rightP.~Point2();
-}
-
-/**
  * @brief Setter for the top segment
  * @param segment, the new top segment
  */
@@ -86,28 +60,28 @@ void Trapezoid::setRightP(const cg3::Point2d& point) { rightP = point; }
  * @brief Setter for the top left neighbor
  * @param trapezoid, index of the new top left neighbor
  */
-void Trapezoid::setTopLeftNeighbor(const size_t trapezoid) {
+void Trapezoid::setTopLeftNeighbor(const size_t& trapezoid) {
     topLeftNeighbor = trapezoid;
 }
 /**
  * @brief Setter for the top right neighbor
  * @param trapezoid, index of the new top right neighbor
  */
-void Trapezoid::setTopRightNeighbor(const size_t trapezoid) {
+void Trapezoid::setTopRightNeighbor(const size_t& trapezoid) {
     topRightNeighbor = trapezoid;
 }
 /**
  * @brief Setter for the bot left neighbor
  * @param trapezoid, index of the new bot left neighbor
  */
-void Trapezoid::setBotLeftNeighbor(const size_t trapezoid) {
+void Trapezoid::setBotLeftNeighbor(const size_t& trapezoid) {
     botLeftNeighbor = trapezoid;
 }
 /**
  * @brief Setter for the bot right neighbor
  * @param trapezoid, index of the new bot right neighbor
  */
-void Trapezoid::setBotRightNeighbor(const size_t trapezoid) {
+void Trapezoid::setBotRightNeighbor(const size_t& trapezoid) {
     botRightNeighbor = trapezoid;
 }
 

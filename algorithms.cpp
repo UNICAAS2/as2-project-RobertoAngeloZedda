@@ -38,23 +38,42 @@ namespace Algorithms {
     }*/
 
     void updateTrapezoidalMapAndDAG(cg3::Segment2d& segment, std::vector<size_t>& trapezoids, DAG& dag, TrapezoidalMap& tm) {
+        /* If the new Segment is contained inside a single Trapezoid,
+         * that Trapezoid needs to be splitted in 4 */
         if(trapezoids.size() == 1) {
             tm.split4(trapezoids[0], segment);
         } else {
+            /* A reference to the Trapezoid that is being replaced
+             * is needed to know in which direction to merge */
+            Trapezoid replacedTrapezoid = tm.getTrapezoid(trapezoids[0]);
+
+            /* The first Trapezoid needs to be splitted in 3 (on the left) */
             std::vector<size_t> newTrpz = tm.split3(trapezoids[0], segment);
 
-            for(size_t i=1; i<trapezoids.size()-2; i++) {
-                if(tm.getTrapezoid(newTrpz[newTrpz.size()-2]).getTopRightNeighbor() == trapezoids[i]) {
-                    newTrpz = tm.split2MergeBot(trapezoids[i], segment, newTrpz[newTrpz.size()-2], newTrpz[newTrpz.size()-1]);
-                } else {
+            /* Split in 2 with a Merge for every Trapezoid not in first nor in last position */
+            for(size_t i=1; i<=trapezoids.size()-2; i++) {
+                /* New reference to the Trapezoid that is being replaced */
+                replacedTrapezoid = tm.getTrapezoid(trapezoids[i]);
+
+                /* If the old Trapezoid's TOP right neighbor is the one that needs to be splitted */
+                if(replacedTrapezoid.getTopRightNeighbor() == trapezoids[i]) {
+                    newTrpz = tm.split2MergeTop(trapezoids[i], segment, newTrpz[newTrpz.size()-2], newTrpz[newTrpz.size()-1]);
+                }
+                /* If the old Trapezoid's BOT right neighbor is the one that needs to be splitted */
+                else if(replacedTrapezoid.getBotRightNeighbor() == trapezoids[i]) {
                     newTrpz = tm.split2MergeBot(trapezoids[i], segment, newTrpz[newTrpz.size()-1], newTrpz[newTrpz.size()-2]);
+                } else {
+                    exit(EXIT_FAILURE);
                 }
             }
 
-            if(tm.getTrapezoid(newTrpz[newTrpz.size()-2]).getTopRightNeighbor() == trapezoids[trapezoids.size()-1]) {
-                newTrpz = tm.split2MergeBot(trapezoids[trapezoids.size()-1], segment, newTrpz[newTrpz.size()-3], newTrpz[newTrpz.size()-2]);
+            /* The last Trapezoid needs to be splitted in 3 with a merge (on the right) */
+            if(replacedTrapezoid.getTopRightNeighbor() == trapezoids[trapezoids.size()-1]) {
+                newTrpz = tm.split3MergeTop(trapezoids[trapezoids.size()-1], segment, newTrpz[newTrpz.size()-2], newTrpz[newTrpz.size()-1]);
+            } else if(replacedTrapezoid.getBotRightNeighbor() == trapezoids[trapezoids.size()-1]) {
+                newTrpz = tm.split3MergeBot(trapezoids[trapezoids.size()-1], segment, newTrpz[newTrpz.size()-1], newTrpz[newTrpz.size()-2]);
             } else {
-                newTrpz = tm.split2MergeBot(trapezoids[trapezoids.size()-1], segment, newTrpz[newTrpz.size()-2], newTrpz[newTrpz.size()-3]);
+                exit(EXIT_FAILURE);
             }
         }
     }

@@ -2,6 +2,8 @@
 
 #include "managers/trapezoidalmap_manager.h"
 
+#include "algorithms.h"
+
 int main(int argc, char *argv[]) {
     CG3_SUPPRESS_WARNING(argc);
     CG3_SUPPRESS_WARNING(argv);
