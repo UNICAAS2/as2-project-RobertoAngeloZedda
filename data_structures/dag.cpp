@@ -15,11 +15,11 @@ const DAGnode& DAG::getNode(const size_t index) const {
 }
 
 void DAG::updateNode(DAGnode& newNode, const size_t index) {
-    if (dynamic_cast<DAGnodePoint*>(&(nodes[index])) != nullptr) {
+    /*if (dynamic_cast<DAGnodePoint*>(&(nodes[index])) != nullptr) {
         DAGnodePoint* ptr = dynamic_cast<DAGnodePoint*>(&(nodes[index]));
         ptr->~DAGnodePoint();
         nodes[index] = newNode;
-    }
+    }*/
 }
 
 size_t DAG::addNode(const DAGnode& newNode) {

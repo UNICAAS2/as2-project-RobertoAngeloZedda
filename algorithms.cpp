@@ -20,14 +20,23 @@ namespace Algorithms {
         }
     }*/
 
-    /*std::vector<size_t> followSegment(cg3::Segment2d& segment, DAG& dag, TrapezoidalMap& tm) {
-        std::vector<size_t> trapezoids = std::vector<size_t>();
+    std::vector<size_t> followSegment(cg3::Segment2d& segment, DAG& dag, TrapezoidalMap& tm, const size_t first) {
+        std::vector<size_t> trapezoids;
 
-        trapezoids.push_back(findPoint(segment.p1(), dag));
+        //trapezoids.push_back(findPoint(segment.p1(), dag));
+        trapezoids.push_back(first);
 
+        /* As long as the Trapezoid we are analyzing does not contain
+         * the right endpoint of the Segment
+         *      if the rightmost point of the Trapezoid lies
+         *      on the RIGHT of the Segment
+         *          the BOT-right neighbor can be added to the Vector
+         *      if the rightmost point of the Trapezoid lies
+         *      on the LEFT of the Segment
+         *          the TOP-right neighbor can be added to the Vector */
         int j = 0;
-        while(segment.p2().x > tm.getTrapezoid(trapezoids[j]).getRightP().x()) {
-            if(tm.getTrapezoid(trapezoids[j]).getRightP().x() is above segment)
+        while(segment.p2().x() > tm.getTrapezoid(trapezoids[j]).getRightP().x()) {
+            if(isPointOnTheRight(segment ,tm.getTrapezoid(trapezoids[j]).getRightP()))
                 trapezoids.push_back(tm.getTrapezoid(trapezoids[j]).getBotRightNeighbor());
             else
                 trapezoids.push_back(tm.getTrapezoid(trapezoids[j]).getTopRightNeighbor());
@@ -35,7 +44,7 @@ namespace Algorithms {
         }
 
         return trapezoids;
-    }*/
+    }
 
     void updateTrapezoidalMapAndDAG(cg3::Segment2d& segment, std::vector<size_t>& trapezoids, DAG& dag, TrapezoidalMap& tm) {
         /* If the new Segment is contained inside a single Trapezoid,
@@ -52,15 +61,16 @@ namespace Algorithms {
 
             /* Split in 2 with a Merge for every Trapezoid not in first nor in last position */
             for(size_t i=1; i<=trapezoids.size()-2; i++) {
-                /* New reference to the Trapezoid that is being replaced */
-                replacedTrapezoid = tm.getTrapezoid(trapezoids[i]);
-
                 /* If the old Trapezoid's TOP right neighbor is the one that needs to be splitted */
                 if(replacedTrapezoid.getTopRightNeighbor() == trapezoids[i]) {
+                    /* New reference to the Trapezoid that is being replaced */
+                    replacedTrapezoid = tm.getTrapezoid(trapezoids[i]);
                     newTrpz = tm.split2MergeTop(trapezoids[i], segment, newTrpz[newTrpz.size()-2], newTrpz[newTrpz.size()-1]);
                 }
                 /* If the old Trapezoid's BOT right neighbor is the one that needs to be splitted */
                 else if(replacedTrapezoid.getBotRightNeighbor() == trapezoids[i]) {
+                    /* New reference to the Trapezoid that is being replaced */
+                    replacedTrapezoid = tm.getTrapezoid(trapezoids[i]);
                     newTrpz = tm.split2MergeBot(trapezoids[i], segment, newTrpz[newTrpz.size()-1], newTrpz[newTrpz.size()-2]);
                 } else {
                     exit(EXIT_FAILURE);
