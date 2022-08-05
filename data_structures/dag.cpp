@@ -1,9 +1,7 @@
 #include "dag.h"
 
 DAG::DAG(const size_t trapezoid) {
-    nodes = std::vector<DAGnode>();
-    DAGnodeTrapezoid root = DAGnodeTrapezoid(trapezoid);
-    nodes.push_back(root);
+    nodes.push_back(DAGnode(trapezoid));
 }
 
 const DAGnode& DAG::getRoot() const {
@@ -11,15 +9,17 @@ const DAGnode& DAG::getRoot() const {
 }
 
 const DAGnode& DAG::getNode(const size_t index) const {
-    return nodes[index];
+    if(index >= 0 && index < nodes.size())
+        return nodes[index];
+    else
+        exit(EXIT_FAILURE);
 }
 
 void DAG::updateNode(DAGnode& newNode, const size_t index) {
-    /*if (dynamic_cast<DAGnodePoint*>(&(nodes[index])) != nullptr) {
-        DAGnodePoint* ptr = dynamic_cast<DAGnodePoint*>(&(nodes[index]));
-        ptr->~DAGnodePoint();
+    if(index >= 0 && index < nodes.size())
         nodes[index] = newNode;
-    }*/
+    else
+        exit(EXIT_FAILURE);
 }
 
 size_t DAG::addNode(const DAGnode& newNode) {
@@ -28,13 +28,21 @@ size_t DAG::addNode(const DAGnode& newNode) {
 }
 
 size_t DAG::addLeftChild(const DAGnode& newNode, const size_t index) {
-    size_t newNodeIndex = this->addNode(newNode);
-    nodes[index].setLeft(newNodeIndex);
-    return newNodeIndex;
+    if(index >= 0 && index < nodes.size()) {
+        size_t newIndex = addNode(newNode);
+        nodes[index].setLeft(newIndex);
+        return newIndex;
+    }
+    else
+        exit(EXIT_FAILURE);
 }
 
 size_t DAG::addRightChild(const DAGnode& newNode, const size_t index) {
-    size_t newNodeIndex = this->addNode(newNode);
-    nodes[index].setRight(newNodeIndex);
-    return newNodeIndex;
+    if(index >= 0 && index < nodes.size()) {
+        size_t newIndex = addNode(newNode);
+        nodes[index].setRight(newIndex);
+        return newIndex;
+    }
+    else
+        exit(EXIT_FAILURE);
 }

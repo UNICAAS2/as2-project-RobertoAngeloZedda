@@ -6,56 +6,38 @@
 
 class DAGnode {
     private:
+        enum NodeType {point, segment, trapezoid};
+        NodeType type;
+
+        cg3::Point2d pointValue;
+        cg3::Segment2d segmentValue;
+        size_t trapezoidValue;
+
         size_t left;
         size_t right;
     public:
-        DAGnode();
-        DAGnode(const size_t left, const size_t right);
+        DAGnode(const cg3::Point2d& p);
+        DAGnode(const cg3::Point2d& p, const size_t l, const size_t r);
+
+        DAGnode(const cg3::Segment2d& s);
+        DAGnode(const cg3::Segment2d& s, const size_t l, const size_t r);
+
+        DAGnode(const size_t t);
+        DAGnode(const size_t t, const size_t l, const size_t r);
 
         void setLeft(const size_t leftNode);
         void setRight(const size_t rightNode);
 
         size_t getLeft() const;
         size_t getRight() const;
-};
 
-class DAGnodePoint : public DAGnode {
-    private:
-        cg3::Point2d value;
-    public:
-        DAGnodePoint(const cg3::Point2d& point);
-        DAGnodePoint(const cg3::Point2d& point,
-                     const size_t left, const size_t right);
+        bool isPointNode() const;
+        bool isSegmentNode() const;
+        bool isTrapezoidNode() const;
 
-        void setValue(const cg3::Point2d& point);
-
-        const cg3::Point2d& getValue() const;
-};
-
-class DAGnodeSegment : public DAGnode {
-    private:
-        cg3::Segment2d value;
-    public:
-        DAGnodeSegment(const cg3::Segment2d& segment);
-        DAGnodeSegment(const cg3::Segment2d& segment,
-                       const size_t left, const size_t right);
-
-        void setValue(const cg3::Segment2d& segment);
-
-        const cg3::Segment2d& getValue() const;
-};
-
-class DAGnodeTrapezoid: public DAGnode {
-    private:
-        size_t value;
-    public:
-        DAGnodeTrapezoid(const size_t trapezoid);
-        DAGnodeTrapezoid(const size_t trapezoid,
-                         const size_t left, const size_t right);
-
-        void setValue(const size_t trapezoid);
-
-        size_t getValue() const;
+        const cg3::Point2d getPointValue() const;
+        const cg3::Segment2d getSegmentValue() const;
+        size_t getTrapezoidValue() const;
 };
 
 
