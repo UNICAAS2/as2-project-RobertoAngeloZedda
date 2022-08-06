@@ -1,7 +1,10 @@
 #include "dagnode.h"
 
 DAGnode::DAGnode(const cg3::Point2d& p) {
-    DAGnode(p, -1, -1);
+    type = point;
+    pointValue = p;
+    left = SIZE_MAX;
+    right = SIZE_MAX;
 }
 
 DAGnode::DAGnode(const cg3::Point2d& p, const size_t l, const size_t r) {
@@ -12,7 +15,10 @@ DAGnode::DAGnode(const cg3::Point2d& p, const size_t l, const size_t r) {
 }
 
 DAGnode::DAGnode(const cg3::Segment2d& s) {
-    DAGnode(s, -1, -1);
+    type = segment;
+    segmentValue = s;
+    left = SIZE_MAX;
+    right = SIZE_MAX;
 }
 
 DAGnode::DAGnode(const cg3::Segment2d& s, const size_t l, const size_t r) {
@@ -23,7 +29,10 @@ DAGnode::DAGnode(const cg3::Segment2d& s, const size_t l, const size_t r) {
 }
 
 DAGnode::DAGnode(const size_t t) {
-    DAGnode(t, -1, -1);
+    type = trapezoid;
+    trapezoidValue = t;
+    left = SIZE_MAX;
+    right = SIZE_MAX;
 }
 
 DAGnode::DAGnode(const size_t t, const size_t l, const size_t r) {

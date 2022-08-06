@@ -1,31 +1,32 @@
 #include "algorithms.h"
 
 namespace Algorithms {
-    /*size_t findPoint(cg3::Point2d& point, DAG& dag) {
+    size_t findPoint(cg3::Point2d& point, DAG& dag) {
         DAGnode currentNode = dag.getRoot();
 
-        while(/*currentNode is NOT a Trapezoid-Node*///) {
-            //if(/*currentNode is a Point-Node*/) {
-                //if(point.x() < /*currentNode.getValue().x()*/)
-                    /*currentNode = dag.getNode(currentNode.getLeft());
+        while(!currentNode.isTrapezoidNode()) {
+            if(currentNode.isPointNode()) {
+                if(point.x() < currentNode.getPointValue().x())
+                    currentNode = dag.getNode(currentNode.getLeft());
                 else
                     currentNode = dag.getNode(currentNode.getRight());
             }
-            if(/*currentNode is a Segment-Node*///) {
-                //if(/*isPointOnTheRight(currentNode.getValue(), point)*/)
-                    /*currentNode = dag.getNode(currentNode.getRight());
-                else
+            if(currentNode.isSegmentNode()) {
+                if(isPointOnTheRight(currentNode.getSegmentValue(), point))
                     currentNode = dag.getNode(currentNode.getLeft());
+                else
+                    currentNode = dag.getNode(currentNode.getRight());
             }
         }
 
-        return currentNode.getValue();
-    }*/
+        return currentNode.getTrapezoidValue();
+    }
 
     std::vector<size_t> followSegment(cg3::Segment2d& segment, DAG& dag, TrapezoidalMap& tm) {
         std::vector<size_t> trapezoids;
 
-        trapezoids.push_back(findPoint(segment.p1(), dag));
+        cg3::Point2d firstPoint = segment.p1();
+        trapezoids.push_back(Algorithms::findPoint(firstPoint, dag));
 
         /* As long as the Trapezoid we are analyzing does not contain
          * the right endpoint of the Segment
