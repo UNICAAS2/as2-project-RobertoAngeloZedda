@@ -127,3 +127,15 @@ size_t Trapezoid::getBotLeftNeighbor() const { return botLeftNeighbor; }
  * @return the index of the bot right neighbor
  */
 size_t Trapezoid::getBotRightNeighbor() const { return botRightNeighbor; }
+
+/**
+ * @brief Setter for the DAG link
+ * @param nodeIndex, the index of the DAGnode inside the DAG that represents this Trapezoid
+ */
+void Trapezoid::setDAGlink(const size_t& nodeIndex) { DAGlink = nodeIndex; }
+
+/**
+ * @brief Getter for the DAG link
+ * @return the index of the DAGnode inside the DAG that represents this Trapezoid
+ */
+size_t Trapezoid::getDAGlink() const { return DAGlink; }

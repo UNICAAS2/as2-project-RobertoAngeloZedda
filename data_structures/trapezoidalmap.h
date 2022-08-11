@@ -16,7 +16,7 @@ class TrapezoidalMap {
     public:
         TrapezoidalMap(const Trapezoid& trapezoid);
 
-        const Trapezoid& getTrapezoid(const size_t& index) const;
+        Trapezoid& getTrapezoid(const size_t& index);
 
         const std::vector<size_t> split4(const size_t& trpzToReplace, const cg3::Segment2d& segment);
         const std::vector<size_t> split3(const size_t& trpzToReplace, const cg3::Segment2d& segment);

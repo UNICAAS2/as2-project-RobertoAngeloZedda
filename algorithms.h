@@ -12,6 +12,11 @@ namespace Algorithms {
     std::vector<size_t> followSegment(cg3::Segment2d& segment, DAG& dag, TrapezoidalMap& tm);
 
     void updateTrapezoidalMapAndDAG(cg3::Segment2d& segment, std::vector<size_t>& trapezoids, DAG& dag, TrapezoidalMap& tm);
+
+    void DAGsplit4(DAG& dag, TrapezoidalMap& tm, cg3::Segment2d s, size_t t1, size_t t2, size_t t3, size_t t4);
+    void DAGsplit3Left(DAG& dag, TrapezoidalMap& tm, cg3::Segment2d s, size_t t1, size_t t2, size_t t3);
+    void DAGsplit3Right(DAG& dag, TrapezoidalMap& tm, cg3::Segment2d s, size_t t1, size_t t2, size_t t3);
+    void DAGsplit2(DAG& dag, TrapezoidalMap& tm, cg3::Segment2d s, size_t t1, size_t t2, size_t tOrigin);
 }
 
 #endif // ALGORITHMS_H

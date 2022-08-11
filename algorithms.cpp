@@ -49,17 +49,21 @@ namespace Algorithms {
     }
 
     void updateTrapezoidalMapAndDAG(cg3::Segment2d& segment, std::vector<size_t>& trapezoids, DAG& dag, TrapezoidalMap& tm) {
+        std::vector<size_t> newTrpz;
+
         /* If the new Segment is contained inside a single Trapezoid,
          * that Trapezoid needs to be splitted in 4 */
         if(trapezoids.size() == 1) {
-            tm.split4(trapezoids[0], segment);
+            newTrpz = tm.split4(trapezoids[0], segment);
+            DAGsplit4(dag, tm, segment, newTrpz[0], newTrpz[1], newTrpz[2], newTrpz[3]);
         } else {
             /* A reference to the Trapezoid that is being replaced
              * is needed to know in which direction to merge */
             Trapezoid replacedTrapezoid = tm.getTrapezoid(trapezoids[0]);
 
             /* The first Trapezoid needs to be splitted in 3 (on the left) */
-            std::vector<size_t> newTrpz = tm.split3(trapezoids[0], segment);
+            newTrpz = tm.split3(trapezoids[0], segment);
+            DAGsplit3Left(dag, tm, segment, newTrpz[0], newTrpz[1], newTrpz[2]);
 
             /* Split in 2 with a Merge for every Trapezoid not in first nor in last position */
             for(size_t i=1; i<=trapezoids.size()-2; i++) {
@@ -77,6 +81,7 @@ namespace Algorithms {
                 } else {
                     exit(EXIT_FAILURE);
                 }
+                DAGsplit2(dag, tm, segment, newTrpz[0], newTrpz[1], i);
             }
 
             /* The last Trapezoid needs to be splitted in 3 with a merge (on the right) */
@@ -87,6 +92,76 @@ namespace Algorithms {
             } else {
                 exit(EXIT_FAILURE);
             }
+            DAGsplit3Right(dag, tm, segment, newTrpz[0], newTrpz[1], newTrpz[2]);
         }
+    }
+
+    void DAGsplit4(DAG& dag, TrapezoidalMap& tm, cg3::Segment2d s, size_t t1, size_t t2, size_t t3, size_t t4) {
+        size_t n1 = dag.updateNode(DAGnode(s.p1()), tm.getTrapezoid(t1).getDAGlink());
+
+        size_t n2 = dag.addLeftChild(DAGnode(t1), n1);
+        size_t n3 = dag.addRightChild(DAGnode(s.p2()), n1);
+
+        size_t n4 = dag.addLeftChild(DAGnode(s), n3);
+        size_t n5 = dag.addRightChild(DAGnode(t4), n3);
+
+        size_t n6 = dag.addLeftChild(DAGnode(t2), n4);
+        size_t n7 = dag.addRightChild(DAGnode(t3), n4);
+
+        tm.getTrapezoid(t1).setDAGlink(n2);
+        tm.getTrapezoid(t2).setDAGlink(n6);
+        tm.getTrapezoid(t3).setDAGlink(n7);
+        tm.getTrapezoid(t4).setDAGlink(n5);
+    }
+
+    void DAGsplit3Left(DAG& dag, TrapezoidalMap& tm, cg3::Segment2d s, size_t t1, size_t t2, size_t t3) {
+        size_t n1 = dag.updateNode(DAGnode(s.p1()), tm.getTrapezoid(t1).getDAGlink());
+
+        size_t n2 = dag.addLeftChild(DAGnode(t1), n1);
+        size_t n3 = dag.addRightChild(DAGnode(s), n1);
+
+        size_t n4 = dag.addLeftChild(DAGnode(t2), n3);
+        size_t n5 = dag.addRightChild(DAGnode(t3), n3);
+
+        tm.getTrapezoid(t1).setDAGlink(n2);
+        tm.getTrapezoid(t2).setDAGlink(n4);
+        tm.getTrapezoid(t3).setDAGlink(n5);
+    }
+
+    void DAGsplit3Right(DAG& dag, TrapezoidalMap& tm, cg3::Segment2d s, size_t t1, size_t t2, size_t t3) {
+        size_t n1 = dag.updateNode(DAGnode(s.p1()), tm.getTrapezoid(t3).getDAGlink());
+
+        size_t n2 = dag.addLeftChild(DAGnode(s), n1);
+        size_t n3 = dag.addRightChild(DAGnode(t3), n1);
+
+        size_t n4, n5;
+        if(tm.getTrapezoid(t1).getDAGlink() == SIZE_MAX)
+            n4 = dag.addLeftChild(DAGnode(t1), n2);
+        else {
+            n4 = tm.getTrapezoid(t1).getDAGlink();
+            dag.getNode(n2).setLeft(n4);
+        }
+        if(tm.getTrapezoid(t2).getDAGlink() == SIZE_MAX)
+            n5 = dag.addRightChild(DAGnode(t2), n2);
+        else {
+            n5 = tm.getTrapezoid(t2).getDAGlink();
+            dag.getNode(n2).setRight(n5);
+        }
+
+        tm.getTrapezoid(t1).setDAGlink(n4);
+        tm.getTrapezoid(t2).setDAGlink(n5);
+        tm.getTrapezoid(t3).setDAGlink(n3);
+    }
+
+    void DAGsplit2(DAG& dag, TrapezoidalMap& tm, cg3::Segment2d s, size_t t1, size_t t2, size_t tOrigin) {
+        size_t n1 = dag.updateNode(DAGnode(s), tm.getTrapezoid(tOrigin).getDAGlink());
+
+        size_t n2 = tm.getTrapezoid(t1).getDAGlink();
+        dag.getNode(n1).setLeft(n2);
+        size_t n3 = tm.getTrapezoid(t2).getDAGlink();
+        dag.getNode(n1).setLeft(n3);
+
+        tm.getTrapezoid(t1).setDAGlink(n2);
+        tm.getTrapezoid(t2).setDAGlink(n3);
     }
 }

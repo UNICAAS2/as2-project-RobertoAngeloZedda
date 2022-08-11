@@ -4,6 +4,15 @@
 #include <cg3/geometry/segment2.h>
 #include <cg3/geometry/point2.h>
 
+/**
+ * @brief Base element of a DAG.
+ * A DAGnode is represented by:
+ *      a "type" which can be "point", "segment" or "trapezoid.
+ *      "pointValue", a "segmentValue" and a "trapezoidValue":
+ *      only one can be used based on the type of the node.
+ *      "left" and "right" which are the indexes of the left
+ *      and right sub-trees inside the DAG
+ */
 class DAGnode {
     private:
         enum NodeType {point, segment, trapezoid};

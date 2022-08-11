@@ -11,6 +11,8 @@
  * A Trapezoid can also have up to four neighbors:
  * topLeft, topRight, botLeft, botRight.
  * They are represented with the index they have inside the TrapezoidalMap's vector.
+ * There is also a reference to the leaf-node that represents the Trapezoid
+ * inside the DAG to allow its access in an effecient way.
  */
 class Trapezoid {
     private:
@@ -23,6 +25,8 @@ class Trapezoid {
         size_t topRightNeighbor;
         size_t botLeftNeighbor;
         size_t botRightNeighbor;
+
+        size_t DAGlink;
     public:
         Trapezoid();
         Trapezoid(const cg3::Segment2d& top, const cg3::Segment2d& bot,
@@ -47,6 +51,9 @@ class Trapezoid {
         size_t getTopRightNeighbor() const;
         size_t getBotLeftNeighbor() const;
         size_t getBotRightNeighbor() const;
+
+        void setDAGlink(const size_t& nodeIndex);
+        size_t getDAGlink() const;
 };
 
 #endif // TRAPEZOID_H

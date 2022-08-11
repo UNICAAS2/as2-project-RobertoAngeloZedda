@@ -33,7 +33,7 @@ void TrapezoidalMap::updateTrapezoid(const size_t& index, const Trapezoid& trape
  * @param index, index of the Trapezoid to return
  * @return the Trapezoid in the index position
  */
-const Trapezoid& TrapezoidalMap::getTrapezoid(const size_t& index) const {
+Trapezoid& TrapezoidalMap::getTrapezoid(const size_t& index) {
     return trapezoids[index];
 }
 
@@ -62,6 +62,8 @@ const std::vector<size_t> TrapezoidalMap::split4(const size_t& trpzToReplace, co
     Trapezoid t2 = Trapezoid(origin.getTop(), segment, segment.p1(), segment.p2());
     Trapezoid t3 = Trapezoid(segment, origin.getBot(), segment.p1(), segment.p2());
     Trapezoid t4 = Trapezoid(origin.getTop(), origin.getBot(), segment.p2(), origin.getRightP());
+
+    t1.setDAGlink(origin.getDAGlink());
 
     /* Indexes in the Trapezoids Vector of the new 4 Trapezoids.
      * The first one will replace the one that is being splitted */
@@ -135,6 +137,8 @@ const std::vector<size_t> TrapezoidalMap::split3(const size_t& trpzToReplace, co
     Trapezoid t1 = Trapezoid(origin.getTop(), origin.getBot(), origin.getLeftP(), segment.p1());
     Trapezoid t2 = Trapezoid(origin.getTop(), segment, segment.p1(), origin.getRightP());
     Trapezoid t3 = Trapezoid(segment, origin.getBot(), segment.p1(), origin.getRightP());
+
+    t1.setDAGlink(origin.getDAGlink());
 
     /* Indexes in the Trapezoids Vector of the new 3 Trapezoids.
      * The first one will replace the one that is being splitted */
@@ -213,6 +217,9 @@ const std::vector<size_t> TrapezoidalMap::split2MergeTop(const size_t& trpzToRep
     Trapezoid t1 = Trapezoid(origin.getTop(), segment, merge.getLeftP(), origin.getRightP());
     Trapezoid t2 = Trapezoid(segment, origin.getBot(), origin.getLeftP(), origin.getRightP());
 
+    t1.setDAGlink(merge.getDAGlink());
+    t2.setDAGlink(origin.getDAGlink());
+
     /* Updating the Vector */
     updateTrapezoid(trpzToMerge, t1);
     updateTrapezoid(trpzToReplace, t2);
@@ -279,6 +286,9 @@ const std::vector<size_t> TrapezoidalMap::split2MergeBot(const size_t& trpzToRep
     Trapezoid t1 = Trapezoid(origin.getTop(), segment, origin.getLeftP(), origin.getRightP());
     Trapezoid t2 = Trapezoid(segment, origin.getBot(), merge.getLeftP(), origin.getRightP());
 
+    t1.setDAGlink(origin.getDAGlink());
+    t2.setDAGlink(merge.getDAGlink());
+
     /* Updating the Vector */
     updateTrapezoid(trpzToReplace, t1);
     updateTrapezoid(trpzToMerge, t2);
@@ -342,6 +352,9 @@ const std::vector<size_t> TrapezoidalMap::split3MergeTop(const size_t& trpzToRep
     Trapezoid t1 = Trapezoid(origin.getTop(), segment, merge.getLeftP(), segment.p2());
     Trapezoid t2 = Trapezoid(segment, origin.getBot(), origin.getLeftP(), segment.p2());
     Trapezoid t3 = Trapezoid(origin.getTop(), origin.getBot(), segment.p2(), origin.getRightP());
+
+    t1.setDAGlink(merge.getDAGlink());
+    t3.setDAGlink(origin.getDAGlink());
 
     /* Indexes in the Trapezoids Vector of the new 3 Trapezoids
      * The first one will replace the one that is being merged
@@ -416,6 +429,9 @@ const std::vector<size_t> TrapezoidalMap::split3MergeBot(const size_t& trpzToRep
     Trapezoid t1 = Trapezoid(origin.getTop(), segment, origin.getLeftP(), segment.p2());
     Trapezoid t2 = Trapezoid(segment, origin.getBot(), merge.getLeftP(), segment.p2());
     Trapezoid t3 = Trapezoid(origin.getTop(), origin.getBot(), segment.p2(), origin.getRightP());
+
+    t2.setDAGlink(merge.getDAGlink());
+    t3.setDAGlink(origin.getDAGlink());
 
     /* Indexes in the Trapezoids Vector of the new 3 Trapezoids
      * The second one will replace the one that is being merged
