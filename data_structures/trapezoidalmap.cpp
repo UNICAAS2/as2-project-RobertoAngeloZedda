@@ -7,6 +7,9 @@
 TrapezoidalMap::TrapezoidalMap(const Trapezoid& boundingBox) {
     trapezoids = std::vector<Trapezoid>();
     trapezoids.push_back(boundingBox);
+    trapezoids[0].setDAGlink(0);
+
+    freeSlotIndex = SIZE_MAX;
 }
 
 /**
@@ -15,8 +18,15 @@ TrapezoidalMap::TrapezoidalMap(const Trapezoid& boundingBox) {
  * @return The index in which the Trapezoid has been inserted
  */
 size_t TrapezoidalMap::addTrapezoid(const Trapezoid& trapezoid) {
-    trapezoids.push_back(trapezoid);
-    return trapezoids.size()-1;
+    if(freeSlotIndex == SIZE_MAX) {
+        trapezoids.push_back(trapezoid);
+        return trapezoids.size()-1;
+    } else {
+        updateTrapezoid(freeSlotIndex, trapezoid);
+        size_t newIndex = freeSlotIndex;
+        freeSlotIndex = SIZE_MAX;
+        return newIndex;
+    }
 }
 
 /**
@@ -39,11 +49,6 @@ Trapezoid& TrapezoidalMap::getTrapezoid(const size_t& index) {
 
 /**
  * @brief Splits the Trapezoid in 4 new Trapezoids.
- * When a new Segment is being inserted into the TrapezoidalMap
- * and it is fully contained inside a single Trapezoid,
- * that Trapezoid has to be splitted in 4 new Trapezoids.
- *
- * This metod performs this type of split.
  *
  * The first Trapezoid, the left most one, will keep the same index
  * of the Trapezoid that is being replaced.
@@ -59,11 +64,10 @@ const std::vector<size_t> TrapezoidalMap::split4(const size_t& trpzToReplace, co
 
     /* Creation of the new 4 Trapezoids */
     Trapezoid t1 = Trapezoid(origin.getTop(), origin.getBot(), origin.getLeftP(), segment.p1());
+    t1.setDAGlink(origin.getDAGlink());
     Trapezoid t2 = Trapezoid(origin.getTop(), segment, segment.p1(), segment.p2());
     Trapezoid t3 = Trapezoid(segment, origin.getBot(), segment.p1(), segment.p2());
     Trapezoid t4 = Trapezoid(origin.getTop(), origin.getBot(), segment.p2(), origin.getRightP());
-
-    t1.setDAGlink(origin.getDAGlink());
 
     /* Indexes in the Trapezoids Vector of the new 4 Trapezoids.
      * The first one will replace the one that is being splitted */
@@ -110,35 +114,25 @@ const std::vector<size_t> TrapezoidalMap::split4(const size_t& trpzToReplace, co
 }
 
 /**
- * @brief Splits the Trapezoid in 3 new Trapezoids.
- * When a new Segment is being inserted into the TrapezoidalMap
- * and it is contained inside multiple Trapezoids,
- * those Trapezoids need to be splitted.
- * The first Trapezoid has to be splitted in 3 new Trapezoids.
- *
- * This metod performs this type of split.
+ * @brief Splits the Trapezoid in 3 new Trapezoids around a Segment starting inside the original Trapezoid.
  *
  * The first Trapezoid, the left most one, will keep the same index
  * of the Trapezoid that is being replaced.
  *
- * The neighbors will also be updated
- * excluding the internal right ones
- * since they need to be handled by the method
- * that performs the split of the "next" Trapezoid.
+ * The neighbors will also be updated.
  * @param trpzToReplace, index of the Trapezoid to replace
  * @param segment, Segment to compute the spit around
  * @return a Vector containing the 3 indexes of the new Trapezoids
  */
-const std::vector<size_t> TrapezoidalMap::split3(const size_t& trpzToReplace, const cg3::Segment2d& segment) {
+const std::vector<size_t> TrapezoidalMap::split3L(const size_t& trpzToReplace, const cg3::Segment2d& segment) {
     /* Reference of the Trapezoid that needs to be splitted */
     Trapezoid origin = trapezoids[trpzToReplace];
 
     /* Creation of the new 3 Trapezoids */
     Trapezoid t1 = Trapezoid(origin.getTop(), origin.getBot(), origin.getLeftP(), segment.p1());
+    t1.setDAGlink(origin.getDAGlink());
     Trapezoid t2 = Trapezoid(origin.getTop(), segment, segment.p1(), origin.getRightP());
     Trapezoid t3 = Trapezoid(segment, origin.getBot(), segment.p1(), origin.getRightP());
-
-    t1.setDAGlink(origin.getDAGlink());
 
     /* Indexes in the Trapezoids Vector of the new 3 Trapezoids.
      * The first one will replace the one that is being splitted */
@@ -167,10 +161,6 @@ const std::vector<size_t> TrapezoidalMap::split3(const size_t& trpzToReplace, co
     if(origin.getBotRightNeighbor() != SIZE_MAX)
         trapezoids[origin.getBotRightNeighbor()].setBotLeftNeighbor(t3Index);
 
-    /* Updating the left neighbors' neighors
-     * isn't needed since the new left trapezoid
-     * will have the same index as the replaced one */
-
     /* Returning the indexes of the edited and created Trapezoids */
     std::vector<size_t> createdTrapezoids = std::vector<size_t>();
     createdTrapezoids.push_back(t1Index);
@@ -181,197 +171,102 @@ const std::vector<size_t> TrapezoidalMap::split3(const size_t& trpzToReplace, co
 }
 
 /**
- * @brief Splits the Trapezoid in 2 new Trapezoids merging the top one.
- * When a new Segment is being inserted into the TrapezoidalMap
- * and it is contained inside multiple Trapezoids,
- * those Trapezoids need to be splitted.
- * Trapezoids not in first nor last position need to be splitted in 2 new Trapezoids
- * and, if the segment is passing through the top right neighbor
- * of the previous Trapezoid it needs to be merged.
- *
- * This metod performs this type of split.
- *
- * The first Trapezoid, the upper one, will keep the same index
- * of the Trapezoid that is being merged.
- * The second one, the lower one, will keep the same index
- * of the Trapezoid that is being replaced.
- *
- * The neighbors will also be updated
- * excluding the internal right ones
- * since they need to be handled by the method
- * that performs the split of the "next" Trapezoid.
- * @param trpzToReplace, index of the Trapezoid to replace
- * @param segment, Segment to compute the spit around
- * @param trpzToMerge, index of the Trapezoid to merge
- * @param trpzNB, index of the other Trapezoid from the previous split (used to update neighbors)
- * @return a Vector containing the 2 indexes of the new Trapezoids
- */
-const std::vector<size_t> TrapezoidalMap::split2MergeTop(const size_t& trpzToReplace, const cg3::Segment2d& segment,
-                                                         const size_t& trpzToMerge, const size_t& trpzNB) {
-    /* Reference of the Trapezoid that needs to be splitted */
-    Trapezoid origin = trapezoids[trpzToReplace];
-    /* Reference of the Trapezoid that needs to be merged */
-    Trapezoid merge = trapezoids[trpzToMerge];
-
-    /* Creation of the new 2 Trapezoids */
-    Trapezoid t1 = Trapezoid(origin.getTop(), segment, merge.getLeftP(), origin.getRightP());
-    Trapezoid t2 = Trapezoid(segment, origin.getBot(), origin.getLeftP(), origin.getRightP());
-
-    t1.setDAGlink(merge.getDAGlink());
-    t2.setDAGlink(origin.getDAGlink());
-
-    /* Updating the Vector */
-    updateTrapezoid(trpzToMerge, t1);
-    updateTrapezoid(trpzToReplace, t2);
-
-    /* Updating t1's neighbors */
-    trapezoids[trpzToMerge].setTopLeftNeighbor(merge.getTopLeftNeighbor());
-    trapezoids[trpzToMerge].setBotLeftNeighbor(merge.getBotLeftNeighbor());
-    trapezoids[trpzToMerge].setTopRightNeighbor(origin.getTopRightNeighbor());//
-
-    /* Updating t2's neighbors */
-    trapezoids[trpzToReplace].setTopLeftNeighbor(trpzNB);
-    trapezoids[trpzToReplace].setBotLeftNeighbor(origin.getBotLeftNeighbor());
-    trapezoids[trpzToReplace].setBotRightNeighbor(origin.getBotRightNeighbor());//
-
-    /* Updating the left neighbors' neighbors */
-    trapezoids[trpzNB].setTopRightNeighbor(trpzToReplace);
-
-    /* Updating the right neighbor's neigbors */
-    if(origin.getTopRightNeighbor() != SIZE_MAX)
-        trapezoids[origin.getTopRightNeighbor()].setTopLeftNeighbor(trpzToMerge);
-
-    /* Returning the indexes of the edited Trapezoids */
-    std::vector<size_t> createdTrapezoids = std::vector<size_t>();
-    createdTrapezoids.push_back(trpzToMerge);
-    createdTrapezoids.push_back(trpzToReplace);
-
-    return createdTrapezoids;
-}
-
-/**
- * @brief Splits the Trapezoid in 2 new Trapezoids merging the bottom one.
- * When a new Segment is being inserted into the TrapezoidalMap
- * and it is contained inside multiple Trapezoids,
- * those Trapezoids need to be splitted.
- * Trapezoids not in first nor last position need to be splitted in 2 new Trapezoids
- * and, if the segment is passing through the bottom right neighbor
- * of the previous Trapezoid it needs to be merged.
- *
- * This metod performs this type of split.
+ * @brief Splits the Trapezoid in 2 new Trapezoids around a Segment.
  *
  * The first Trapezoid, the upper one, will keep the same index
  * of the Trapezoid that is being replaced.
- * The second one, the lower one, will keep the same index
- * of the Trapezoid that is being merged.
  *
- * The neighbors will also be updated
- * excluding the internal right ones
- * since they need to be handled by the method
- * that performs the split of the "next" Trapezoid.
+ * The neighbors will also be updated.
  * @param trpzToReplace, index of the Trapezoid to replace
  * @param segment, Segment to compute the spit around
- * @param trpzToMerge, index of the Trapezoid to merge
- * @param trpzNB, index of the other Trapezoid from the previous split (used to update neighbors)
- * @return a Vector containing the 2 indexes of the new Trapezoids
+ * @param trpzPrevSplitTop, index of the left neighbor Trapezoid from a previous split (above the segment).
+ * @param trpzPrevSplitBot, index of the left neighbor Trapezoid from a previous split (under the segment).
+ * @return a Vector containing the 3 indexes of the new Trapezoids
  */
-const std::vector<size_t> TrapezoidalMap::split2MergeBot(const size_t& trpzToReplace, const cg3::Segment2d& segment,
-                                                         const size_t& trpzToMerge, const size_t& trpzNB) {
+const std::vector<size_t> TrapezoidalMap::split2(const size_t& trpzToReplace, const cg3::Segment2d& segment,
+                                                 const size_t& trpzPrevSplitTop, const size_t& trpzPrevSplitBot) {
     /* Reference of the Trapezoid that needs to be splitted */
     Trapezoid origin = trapezoids[trpzToReplace];
-    /* Reference of the Trapezoid that needs to be merged */
-    Trapezoid merge = trapezoids[trpzToMerge];
 
     /* Creation of the new 2 Trapezoids */
     Trapezoid t1 = Trapezoid(origin.getTop(), segment, origin.getLeftP(), origin.getRightP());
-    Trapezoid t2 = Trapezoid(segment, origin.getBot(), merge.getLeftP(), origin.getRightP());
-
     t1.setDAGlink(origin.getDAGlink());
-    t2.setDAGlink(merge.getDAGlink());
+    Trapezoid t2 = Trapezoid(segment, origin.getBot(), origin.getLeftP(), origin.getRightP());
 
     /* Updating the Vector */
     updateTrapezoid(trpzToReplace, t1);
-    updateTrapezoid(trpzToMerge, t2);
+    size_t t1Index = trpzToReplace;
+    size_t t2Index = addTrapezoid(t2);
 
     /* Updating t1's neighbors */
-    trapezoids[trpzToReplace].setTopLeftNeighbor(origin.getTopLeftNeighbor());
-    trapezoids[trpzToReplace].setBotLeftNeighbor(trpzNB);
-    trapezoids[trpzToReplace].setTopRightNeighbor(origin.getTopRightNeighbor());//
+    trapezoids[t1Index].setTopLeftNeighbor(origin.getTopLeftNeighbor());
+    trapezoids[t1Index].setTopRightNeighbor(origin.getTopRightNeighbor());
+    trapezoids[t1Index].setBotLeftNeighbor(trpzPrevSplitTop);
 
     /* Updating t2's neighbors */
-    trapezoids[trpzToMerge].setTopLeftNeighbor(merge.getTopLeftNeighbor());
-    trapezoids[trpzToMerge].setBotLeftNeighbor(merge.getBotLeftNeighbor());
-    trapezoids[trpzToMerge].setBotRightNeighbor(origin.getBotRightNeighbor());//
+    trapezoids[t2Index].setTopLeftNeighbor(trpzPrevSplitBot);
+    trapezoids[t2Index].setBotLeftNeighbor(origin.getBotLeftNeighbor());
+    trapezoids[t2Index].setBotRightNeighbor(origin.getBotRightNeighbor());
 
     /* Updating the left neighbors' neighbors */
-    trapezoids[trpzNB].setBotRightNeighbor(trpzToReplace);
+    if(trpzPrevSplitTop != SIZE_MAX)
+        trapezoids[trpzPrevSplitTop].setBotRightNeighbor(t1Index);
+    if(trpzPrevSplitBot != SIZE_MAX)
+        trapezoids[trpzPrevSplitBot].setTopRightNeighbor(t2Index);
+
+    if(origin.getBotLeftNeighbor() != SIZE_MAX)
+        trapezoids[origin.getBotLeftNeighbor()].setBotRightNeighbor(t2Index);
 
     /* Updating the right neighbor's neigbors */
     if(origin.getBotRightNeighbor() != SIZE_MAX)
-        trapezoids[origin.getBotRightNeighbor()].setBotLeftNeighbor(trpzToMerge);
+        trapezoids[origin.getBotRightNeighbor()].setBotLeftNeighbor(t2Index);
 
     /* Returning the indexes of the edited Trapezoids */
     std::vector<size_t> createdTrapezoids = std::vector<size_t>();
-    createdTrapezoids.push_back(trpzToReplace);
-    createdTrapezoids.push_back(trpzToMerge);
+    createdTrapezoids.push_back(t1Index);
+    createdTrapezoids.push_back(t2Index);
 
     return createdTrapezoids;
 }
 
 /**
- * @brief Splits the Trapezoid in 3 new Trapezoids merging the top one.
- * When a new Segment is being inserted into the TrapezoidalMap
- * and it is contained inside multiple Trapezoids,
- * those Trapezoids need to be splitted.
- * The last Trapezoid needs to be splitted in 3 new Trapezoids
- * and, if the segment is passing through the top right neighbor
- * of the previous Trapezoid it needs to be merged.
+ * @brief Splits the Trapezoid in 3 new Trapezoids around a Segment ending inside the original Trapezoid.
  *
- * This metod performs this type of split.
- *
- * The first Trapezoid, the upper one, will keep the same index
- * of the Trapezoid that is being merged.
- * The third one, the right most one, will keep the same index
+ * The third Trapezoid, the right most one, will keep the same index
  * of the Trapezoid that is being replaced.
  *
- * All neighbors will also be updated.
+ * The neighbors will also be updated.
  * @param trpzToReplace, index of the Trapezoid to replace
  * @param segment, Segment to compute the spit around
- * @param trpzToMerge, index of the Trapezoid to merge
- * @param trpzNB, index of the other Trapezoid from the previous split (used to update neighbors)
+ * @param trpzPrevSplitTop, index of the left neighbor Trapezoid from a previous split (above the segment).
+ * @param trpzPrevSplitBot, index of the left neighbor Trapezoid from a previous split (under the segment).
  * @return a Vector containing the 3 indexes of the new Trapezoids
  */
-const std::vector<size_t> TrapezoidalMap::split3MergeTop(const size_t& trpzToReplace, const cg3::Segment2d& segment,
-                                                         const size_t& trpzToMerge, const size_t& trpzNB) {
+const std::vector<size_t> TrapezoidalMap::split3R(const size_t& trpzToReplace, const cg3::Segment2d& segment,
+                                                         const size_t& trpzPrevSplitTop, const size_t& trpzPrevSplitBot) {
     /* Reference of the Trapezoid that needs to be splitted */
     Trapezoid origin = trapezoids[trpzToReplace];
-    /* Reference of the Trapezoid that needs to be merged */
-    Trapezoid merge = trapezoids[trpzToMerge];
 
     /* Creation of the new 3 Trapezoids */
-    Trapezoid t1 = Trapezoid(origin.getTop(), segment, merge.getLeftP(), segment.p2());
+    Trapezoid t1 = Trapezoid(origin.getTop(), segment, origin.getLeftP(), segment.p2());
     Trapezoid t2 = Trapezoid(segment, origin.getBot(), origin.getLeftP(), segment.p2());
     Trapezoid t3 = Trapezoid(origin.getTop(), origin.getBot(), segment.p2(), origin.getRightP());
-
-    t1.setDAGlink(merge.getDAGlink());
     t3.setDAGlink(origin.getDAGlink());
 
     /* Indexes in the Trapezoids Vector of the new 3 Trapezoids
-     * The first one will replace the one that is being merged
      * The third one will replace the one that is being splitted */
-    updateTrapezoid(trpzToMerge, t1);
-    size_t t1Index = trpzToMerge;
+    size_t t1Index = addTrapezoid(t1);
     size_t t2Index = addTrapezoid(t2);
     updateTrapezoid(trpzToReplace, t3);
     size_t t3Index = trpzToReplace;;
 
     /* Updating t1's neighbors */
-    trapezoids[t1Index].setTopLeftNeighbor(merge.getTopLeftNeighbor());
-    trapezoids[t1Index].setBotLeftNeighbor(merge.getBotLeftNeighbor());
+    trapezoids[t1Index].setTopLeftNeighbor(origin.getTopLeftNeighbor());
+    trapezoids[t1Index].setBotLeftNeighbor(trpzPrevSplitTop);
     trapezoids[t1Index].setTopRightNeighbor(t3Index);
 
     /* Updating t2's neighbors */
-    trapezoids[t2Index].setTopLeftNeighbor(trpzNB);
+    trapezoids[t2Index].setTopLeftNeighbor(trpzPrevSplitBot);
     trapezoids[t2Index].setBotLeftNeighbor(origin.getBotLeftNeighbor());
     trapezoids[t2Index].setBotRightNeighbor(t3Index);
 
@@ -382,7 +277,13 @@ const std::vector<size_t> TrapezoidalMap::split3MergeTop(const size_t& trpzToRep
     trapezoids[t3Index].setBotRightNeighbor(origin.getBotRightNeighbor());
 
     /* Updating the left neighbors' neighbors */
-    trapezoids[trpzNB].setTopRightNeighbor(t2Index);
+    if(trpzPrevSplitTop != SIZE_MAX)
+        trapezoids[trpzPrevSplitTop].setBotRightNeighbor(t1Index);
+    if(trpzPrevSplitBot != SIZE_MAX)
+        trapezoids[trpzPrevSplitBot].setTopRightNeighbor(t2Index);
+
+    if(origin.getTopLeftNeighbor() != SIZE_MAX)
+        trapezoids[origin.getTopLeftNeighbor()].setTopRightNeighbor(t1Index);
     if(origin.getBotLeftNeighbor() != SIZE_MAX)
         trapezoids[origin.getBotLeftNeighbor()].setBotRightNeighbor(t2Index);
 
@@ -394,80 +295,31 @@ const std::vector<size_t> TrapezoidalMap::split3MergeTop(const size_t& trpzToRep
 
     return createdTrapezoids;
 }
-
 /**
- * @brief Splits the Trapezoid in 3 new Trapezoids merging the bottom one.
- * When a new Segment is being inserted into the TrapezoidalMap
- * and it is contained inside multiple Trapezoids,
- * those Trapezoids need to be splitted.
- * The last Trapezoid needs to be splitted in 3 new Trapezoids
- * and, if the segment is passing through the bottom right neighbor
- * of the previous Trapezoid it needs to be merged.
+ * @brief Merges two Trapezoids.
  *
- * This metod performs this type of split.
+ * The left trapezoid will be updated inside the map.
+ * The right trapezoid will be considered as deleted.
  *
- * The second Trapezoid, the lower one, will keep the same index
- * of the Trapezoid that is being merged.
- * The third one, the right most one, will keep the same index
- * of the Trapezoid that is being replaced.
- *
- * All neighbors will also be updated.
- * @param trpzToReplace, index of the Trapezoid to replace
- * @param segment, Segment to compute the spit around
- * @param trpzToMerge, index of the Trapezoid to merge
- * @param trpzNB, index of the other Trapezoid from the previous split (used to update neighbors)
- * @return a Vector containing the 3 indexes of the new Trapezoids
+ * The neighbors will also be updated.
+ * @param leftTrpzIndex, index of the left Trapezoid to merge
+ * @param rightTrpzIndex, index of the right Trapezoid to merge
  */
-const std::vector<size_t> TrapezoidalMap::split3MergeBot(const size_t& trpzToReplace, const cg3::Segment2d& segment,
-                                                         const size_t& trpzToMerge, const size_t& trpzNB) {
-    /* Reference of the Trapezoid that needs to be splitted */
-    Trapezoid origin = trapezoids[trpzToReplace];
-    /* Reference of the Trapezoid that needs to be merged */
-    Trapezoid merge = trapezoids[trpzToMerge];
+void TrapezoidalMap::merge(size_t leftTrpzIndex, size_t rightTrpzIndex) {
+    Trapezoid t2 = trapezoids[rightTrpzIndex];
 
-    /* Creation of the new 3 Trapezoids */
-    Trapezoid t1 = Trapezoid(origin.getTop(), segment, origin.getLeftP(), segment.p2());
-    Trapezoid t2 = Trapezoid(segment, origin.getBot(), merge.getLeftP(), segment.p2());
-    Trapezoid t3 = Trapezoid(origin.getTop(), origin.getBot(), segment.p2(), origin.getRightP());
+    /* "Deleting" the right Trapezoid */
+    freeSlotIndex = rightTrpzIndex;
 
-    t2.setDAGlink(merge.getDAGlink());
-    t3.setDAGlink(origin.getDAGlink());
+    /* Updating the right point and the right nighbors */
+    trapezoids[leftTrpzIndex].setRightP(t2.getRightP());
 
-    /* Indexes in the Trapezoids Vector of the new 3 Trapezoids
-     * The second one will replace the one that is being merged
-     * The third one will replace the one that is being splitted */
-    size_t t1Index = addTrapezoid(t1);
-    updateTrapezoid(trpzToMerge, t2);
-    size_t t2Index = trpzToMerge;
-    updateTrapezoid(trpzToReplace, t3);
-    size_t t3Index = trpzToReplace;;
+    trapezoids[leftTrpzIndex].setTopRightNeighbor(t2.getTopRightNeighbor());
+    trapezoids[leftTrpzIndex].setBotRightNeighbor(t2.getBotRightNeighbor());
 
-    /* Updating t1's neighbors */
-    trapezoids[t1Index].setTopLeftNeighbor(origin.getTopLeftNeighbor());
-    trapezoids[t1Index].setBotLeftNeighbor(trpzNB);
-    trapezoids[t1Index].setTopRightNeighbor(t3Index);
-
-    /* Updating t2's neighbors */
-    trapezoids[t2Index].setTopLeftNeighbor(merge.getTopLeftNeighbor());
-    trapezoids[t2Index].setBotLeftNeighbor(merge.getBotLeftNeighbor());
-    trapezoids[t2Index].setBotRightNeighbor(t3Index);
-
-    /* Updating t3's neighbors */
-    trapezoids[t3Index].setTopLeftNeighbor(t1Index);
-    trapezoids[t3Index].setBotLeftNeighbor(t2Index);
-    trapezoids[t3Index].setTopRightNeighbor(origin.getTopRightNeighbor());
-    trapezoids[t3Index].setBotRightNeighbor(origin.getBotRightNeighbor());
-
-    /* Updating the left neighbors' neighbors */
-    trapezoids[trpzNB].setBotRightNeighbor(t1Index);
-    if(origin.getTopLeftNeighbor() != SIZE_MAX)
-        trapezoids[origin.getTopLeftNeighbor()].setTopRightNeighbor(t1Index);
-
-    /* Returning the indexes of the edited and created Trapezoids */
-    std::vector<size_t> createdTrapezoids = std::vector<size_t>();
-    createdTrapezoids.push_back(t1Index);
-    createdTrapezoids.push_back(t2Index);
-    createdTrapezoids.push_back(t3Index);
-
-    return createdTrapezoids;
+    /* Updating neighbors' neighbors */
+    if(trapezoids[leftTrpzIndex].getTopRightNeighbor() != SIZE_MAX)
+        trapezoids[trapezoids[leftTrpzIndex].getTopRightNeighbor()].setTopLeftNeighbor(leftTrpzIndex);
+    if(trapezoids[leftTrpzIndex].getBotRightNeighbor() != SIZE_MAX)
+        trapezoids[trapezoids[leftTrpzIndex].getBotRightNeighbor()].setBotLeftNeighbor(leftTrpzIndex);
 }

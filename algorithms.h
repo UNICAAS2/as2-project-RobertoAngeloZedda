@@ -7,7 +7,7 @@
 #include "utils/utils.h"
 
 namespace Algorithms {
-    size_t findPoint(cg3::Point2d& point, DAG& dag);
+    size_t findPoint(cg3::Point2d& point, DAG& dag, cg3::Point2d& point2);
 
     std::vector<size_t> followSegment(cg3::Segment2d& segment, DAG& dag, TrapezoidalMap& tm);
 

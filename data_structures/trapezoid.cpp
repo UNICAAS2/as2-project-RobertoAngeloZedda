@@ -33,6 +33,8 @@ Trapezoid::Trapezoid(const cg3::Segment2d &top, const cg3::Segment2d &bot,
     topRightNeighbor = SIZE_MAX;
     botLeftNeighbor = SIZE_MAX;
     botRightNeighbor = SIZE_MAX;
+
+    DAGlink = SIZE_MAX;
 }
 
 /**
