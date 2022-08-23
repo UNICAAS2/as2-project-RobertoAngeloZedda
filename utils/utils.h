@@ -6,6 +6,7 @@
 
 namespace Algorithms {
     bool isPointOnTheRight(const cg3::Segment2d s, const cg3::Point2d p);
+    cg3::Segment2d fixSegmentDirection(const cg3::Segment2d& s);
 }
 
 #endif // UTILS_H

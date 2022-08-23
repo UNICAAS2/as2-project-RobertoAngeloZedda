@@ -2,10 +2,18 @@
 
 /**
  * @brief TrapezoidalMap Constructor
- * @param boundingBox, first Trapezoid
+ * @param topRight, top right point of the bounding box
+ * @param botLeft, bot left point of the bounding box
  */
-TrapezoidalMap::TrapezoidalMap(const Trapezoid& boundingBox) {
+TrapezoidalMap::TrapezoidalMap(const cg3::Point2d botLeft, const cg3::Point2d topRight) {
     trapezoids = std::vector<Trapezoid>();
+
+    boundingBox = Trapezoid(
+                cg3::Segment2d(cg3::Point2d(botLeft.x(), topRight.y()), topRight),
+                cg3::Segment2d(botLeft, cg3::Point2d(topRight.x(), botLeft.y())),
+                botLeft,
+                topRight);
+
     trapezoids.push_back(boundingBox);
     trapezoids[0].setDAGlink(0);
 
@@ -44,6 +52,15 @@ void TrapezoidalMap::updateTrapezoid(const size_t& index, const Trapezoid& trape
  * @return the Trapezoid in the index position
  */
 Trapezoid& TrapezoidalMap::getTrapezoid(const size_t& index) {
+    return trapezoids[index];
+}
+
+/**
+ * @brief Returns the Trapezoid located in the index position but it cannot be modified
+ * @param index, index of the Trapezoid to return
+ * @return the Trapezoid in the index position
+ */
+const Trapezoid& TrapezoidalMap::getTrapezoid(const size_t& index) const {
     return trapezoids[index];
 }
 
@@ -322,4 +339,25 @@ void TrapezoidalMap::merge(size_t leftTrpzIndex, size_t rightTrpzIndex) {
         trapezoids[trapezoids[leftTrpzIndex].getTopRightNeighbor()].setTopLeftNeighbor(leftTrpzIndex);
     if(trapezoids[leftTrpzIndex].getBotRightNeighbor() != SIZE_MAX)
         trapezoids[trapezoids[leftTrpzIndex].getBotRightNeighbor()].setBotLeftNeighbor(leftTrpzIndex);
+}
+
+const std::vector<Trapezoid> TrapezoidalMap::getTrapezoids() const {
+    return trapezoids;
+}
+
+size_t TrapezoidalMap::getFreeSlotIndex() const {
+    return freeSlotIndex;
+}
+
+const Trapezoid TrapezoidalMap::getBoundingBox() const {
+    return boundingBox;
+}
+
+void TrapezoidalMap::clear() {
+    trapezoids.clear();
+
+    trapezoids.push_back(boundingBox);
+    trapezoids[0].setDAGlink(0);
+
+    freeSlotIndex = SIZE_MAX;
 }

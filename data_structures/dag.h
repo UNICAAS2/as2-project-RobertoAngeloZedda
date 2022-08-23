@@ -13,7 +13,7 @@ class DAG {
     private:
         std::vector<DAGnode> nodes;
     public:
-        DAG(const size_t trapezoid);
+        DAG();
 
         DAGnode& getRoot();
         DAGnode& getNode(const size_t index);
@@ -28,6 +28,8 @@ class DAG {
         void split3L(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, std::vector<size_t> trpzs);
         void split3R(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, std::vector<size_t> trpzs);
         void split2(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, std::vector<size_t> trpzs);
+
+        size_t clear();
 };
 
 #endif // DAG_H

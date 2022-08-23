@@ -2,11 +2,8 @@
 
 /**
  * @brief DAG Constructor
- * @param trapezoid, first Trapezoid
  */
-DAG::DAG(const size_t trapezoid) {
-    nodes.push_back(DAGnode(trapezoid));
-}
+DAG::DAG() { }
 
 /**
  * @brief Getter for the root of the DAG
@@ -138,7 +135,7 @@ void DAG::split3L(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, st
  * @param trpsz, vecotr of indexes of Trapezoid involved in the split
  */
 void DAG::split3R(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, std::vector<size_t> trpzs) {
-    size_t n1 = updateNode(DAGnode(s.p1()), nodeToReplace);
+    size_t n1 = updateNode(DAGnode(s.p2()), nodeToReplace);
 
     size_t n2 = addLeftChild(DAGnode(s), n1);
     size_t n3 = addRightChild(DAGnode(trpzs[2]), n1);
@@ -189,4 +186,10 @@ void DAG::split2(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, std
 
     tm.getTrapezoid(trpzs[0]).setDAGlink(n2);
     tm.getTrapezoid(trpzs[1]).setDAGlink(n3);
+}
+
+size_t DAG::clear() {
+    nodes.clear();
+    size_t i = addNode(0);
+    return i;
 }

@@ -5,10 +5,10 @@ namespace Algorithms {
      * @brief Finds the Trapezoid containing a Point using the DAG
      * @param point, the Point
      * @param dag, the DAG
-     * * @param point2, the second Point used in case the first one overlaps with one already used
+     * @param point2, the second Point used in case the first one overlaps with one already used
      * @return returns the index (inside the TrapezoidalMap) of the Trapezoid containing the Point.
      */
-    size_t findPoint(cg3::Point2d& point, DAG& dag, cg3::Point2d& point2) {
+    size_t findPoint(const cg3::Point2d& point, DAG& dag, const cg3::Point2d& point2) {
         DAGnode currentNode = dag.getRoot();
 
         while(!currentNode.isTrapezoidNode()) {
@@ -43,7 +43,7 @@ namespace Algorithms {
      * @param tm, the Trapezoidal Map
      * @return a vector containing the indexes of the Trapezoids in which the segment lies (from left to right)
      */
-    std::vector<size_t> followSegment(cg3::Segment2d& segment, DAG& dag, TrapezoidalMap& tm) {
+    std::vector<size_t> followSegment(const cg3::Segment2d& segment, DAG& dag, TrapezoidalMap& tm) {
         std::vector<size_t> trapezoids;
 
         cg3::Point2d firstPoint = segment.p1();
@@ -77,7 +77,7 @@ namespace Algorithms {
      * @param dag, the DAG
      * @param tm, the Trapezoidal Map
      */
-    void updateTrapezoidalMapAndDAG(cg3::Segment2d& segment, std::vector<size_t>& trapezoids, DAG& dag, TrapezoidalMap& tm) {
+    void updateTrapezoidalMapAndDAG(const cg3::Segment2d& segment, std::vector<size_t>& trapezoids, DAG& dag, TrapezoidalMap& tm) {
         /* Set of trapezoids (indexes) as result of a split operation */
         std::vector<size_t> newTrpz;
 

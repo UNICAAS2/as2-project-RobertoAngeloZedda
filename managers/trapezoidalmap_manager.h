@@ -12,6 +12,10 @@
 
 #include "drawables/drawable_trapezoidalmap_dataset.h"
 
+#include "drawables/drawabletrapezoidalmap.h"
+#include "data_structures/dag.h"
+#include "algorithms.h"
+
 namespace Ui {
     class TrapezoidalMapManager;
 }
@@ -57,8 +61,8 @@ private:
     //---------------------------------------------------------------------
     //Declare your attributes here
 
-
-
+    DrawableTrapezoidalMap dtm;
+    DAG dag;
 
     //#####################################################################
 

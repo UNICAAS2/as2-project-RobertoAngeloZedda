@@ -36,7 +36,10 @@ TrapezoidalMapManager::TrapezoidalMapManager(QWidget *parent) :
                 cg3::Point2d(BOUNDINGBOX, BOUNDINGBOX)),
     firstPointSelectedColor(220, 80, 80),
     firstPointSelectedSize(5),
-    isFirstPointSelected(false)
+    isFirstPointSelected(false),
+    dtm(cg3::Point2d(-BOUNDINGBOX,-BOUNDINGBOX),
+        cg3::Point2d( BOUNDINGBOX, BOUNDINGBOX)),
+    dag()
 {
     //NOTE 1: you probably need to initialize some objects in the constructor. You
     //can see how to initialize an attribute in the lines above. This is C++ style
@@ -66,7 +69,6 @@ TrapezoidalMapManager::TrapezoidalMapManager(QWidget *parent) :
     mainWindow.pushDrawableObject(&drawableTrapezoidalMapDataset, "Segments");
 
 
-
     //---------------------------------------------------------------------
     //Add the drawable objects you need. Note that the drawable trapezoidal map could only
     //draw the trapezoids (polygons, see GL_POLYGON!). You have already the segments drawn.
@@ -86,7 +88,9 @@ TrapezoidalMapManager::TrapezoidalMapManager(QWidget *parent) :
 
     //#####################################################################
 
+    dag.addNode(DAGnode(0));
 
+    mainWindow.pushDrawableObject(&dtm, "Trapezoidal Map");
 
     //Fit the scene
     fitScene();
@@ -199,11 +203,14 @@ void TrapezoidalMapManager::addSegmentToTrapezoidalMap(const cg3::Segment2d& seg
 
     //#####################################################################
 
-
+    cg3::Segment2d fixedSegment = Algorithms::fixSegmentDirection(segment);
+    std::vector<size_t> trapezoids = Algorithms::followSegment(fixedSegment, dag, dtm);
+    Algorithms::updateTrapezoidalMapAndDAG(fixedSegment, trapezoids, dag, dtm);
+    dtm.updateColors();
 
     //You can delete this line after you implement the algorithm: it is
     //just needed to suppress the unused-variable warning
-    CG3_SUPPRESS_WARNING(segment);
+    //CG3_SUPPRESS_WARNING(segment);
 }
 
 /**
@@ -250,8 +257,7 @@ void TrapezoidalMapManager::queryTrapezoidalMap(const cg3::Point2d& queryPoint)
     //the output trapezoid in the canvas (DrawableTrapezoidMap should implement the method
     //to do that).
 
-
-
+    dtm.setSelectedTrapezoid(Algorithms::findPoint(queryPoint, dag, queryPoint));
 
 
     //#####################################################################
@@ -260,7 +266,7 @@ void TrapezoidalMapManager::queryTrapezoidalMap(const cg3::Point2d& queryPoint)
 
     //You can delete this line after you implement the algorithm: it is
     //just needed to suppress the unused-variable warning
-    CG3_SUPPRESS_WARNING(queryPoint);
+    //CG3_SUPPRESS_WARNING(queryPoint);
 }
 
 /**
@@ -271,7 +277,8 @@ void TrapezoidalMapManager::clearTrapezoidalMap()
     //---------------------------------------------------------------------
     //Clear here your trapezoidal map data structure.
 
-
+    dtm.clear();
+    dag.clear();
 
     //#####################################################################
 }
