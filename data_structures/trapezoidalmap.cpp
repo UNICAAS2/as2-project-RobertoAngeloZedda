@@ -2,10 +2,10 @@
 
 /**
  * @brief TrapezoidalMap Constructor
- * @param topRight, top right point of the bounding box
  * @param botLeft, bot left point of the bounding box
+ * @param topRight, top right point of the bounding box
  */
-TrapezoidalMap::TrapezoidalMap(const cg3::Point2d botLeft, const cg3::Point2d topRight) {
+TrapezoidalMap::TrapezoidalMap(const cg3::Point2d& botLeft, const cg3::Point2d& topRight) {
     trapezoids = std::vector<Trapezoid>();
 
     boundingBox = Trapezoid(
@@ -43,6 +43,7 @@ size_t TrapezoidalMap::addTrapezoid(const Trapezoid& trapezoid) {
  * @param trapezoid, new Trapezoid
  */
 void TrapezoidalMap::updateTrapezoid(const size_t& index, const Trapezoid& trapezoid) {
+    assert(index >= 0 && index < trapezoids.size());
     trapezoids[index] = trapezoid;
 }
 
@@ -52,6 +53,7 @@ void TrapezoidalMap::updateTrapezoid(const size_t& index, const Trapezoid& trape
  * @return the Trapezoid in the index position
  */
 Trapezoid& TrapezoidalMap::getTrapezoid(const size_t& index) {
+    assert(index >= 0 && index < trapezoids.size());
     return trapezoids[index];
 }
 
@@ -61,6 +63,7 @@ Trapezoid& TrapezoidalMap::getTrapezoid(const size_t& index) {
  * @return the Trapezoid in the index position
  */
 const Trapezoid& TrapezoidalMap::getTrapezoid(const size_t& index) const {
+    assert(index >= 0 && index < trapezoids.size());
     return trapezoids[index];
 }
 
@@ -75,7 +78,7 @@ const Trapezoid& TrapezoidalMap::getTrapezoid(const size_t& index) const {
  * @param segment, Segment to compute the spit around
  * @return a Vector containing the 4 indexes of the new Trapezoids
  */
-const std::vector<size_t> TrapezoidalMap::split4(const size_t& trpzToReplace, const cg3::Segment2d& segment) {
+const std::array<size_t, 4> TrapezoidalMap::split4(const size_t& trpzToReplace, const cg3::Segment2d& segment) {
     /* Reference of the Trapezoid that needs to be splitted */
     Trapezoid origin = trapezoids[trpzToReplace];
 
@@ -121,11 +124,11 @@ const std::vector<size_t> TrapezoidalMap::split4(const size_t& trpzToReplace, co
         trapezoids[origin.getBotRightNeighbor()].setBotLeftNeighbor(t4Index);
 
     /* Returning the indexes of the edited and created Trapezoids */
-    std::vector<size_t> createdTrapezoids;
-    createdTrapezoids.push_back(t1Index);
-    createdTrapezoids.push_back(t2Index);
-    createdTrapezoids.push_back(t3Index);
-    createdTrapezoids.push_back(t4Index);
+    std::array<size_t, 4> createdTrapezoids;
+    createdTrapezoids[0] = t1Index;
+    createdTrapezoids[1] = t2Index;
+    createdTrapezoids[2] = t3Index;
+    createdTrapezoids[3] = t4Index;
 
     return createdTrapezoids;
 }
@@ -141,7 +144,7 @@ const std::vector<size_t> TrapezoidalMap::split4(const size_t& trpzToReplace, co
  * @param segment, Segment to compute the spit around
  * @return a Vector containing the 3 indexes of the new Trapezoids
  */
-const std::vector<size_t> TrapezoidalMap::split3L(const size_t& trpzToReplace, const cg3::Segment2d& segment) {
+const std::array<size_t, 3> TrapezoidalMap::split3L(const size_t& trpzToReplace, const cg3::Segment2d& segment) {
     /* Reference of the Trapezoid that needs to be splitted */
     Trapezoid origin = trapezoids[trpzToReplace];
 
@@ -179,10 +182,10 @@ const std::vector<size_t> TrapezoidalMap::split3L(const size_t& trpzToReplace, c
         trapezoids[origin.getBotRightNeighbor()].setBotLeftNeighbor(t3Index);
 
     /* Returning the indexes of the edited and created Trapezoids */
-    std::vector<size_t> createdTrapezoids = std::vector<size_t>();
-    createdTrapezoids.push_back(t1Index);
-    createdTrapezoids.push_back(t2Index);
-    createdTrapezoids.push_back(t3Index);
+    std::array<size_t, 3> createdTrapezoids;
+    createdTrapezoids[0] = t1Index;
+    createdTrapezoids[1] = t2Index;
+    createdTrapezoids[2] = t3Index;
 
     return createdTrapezoids;
 }
@@ -200,8 +203,8 @@ const std::vector<size_t> TrapezoidalMap::split3L(const size_t& trpzToReplace, c
  * @param trpzPrevSplitBot, index of the left neighbor Trapezoid from a previous split (under the segment).
  * @return a Vector containing the 3 indexes of the new Trapezoids
  */
-const std::vector<size_t> TrapezoidalMap::split2(const size_t& trpzToReplace, const cg3::Segment2d& segment,
-                                                 const size_t& trpzPrevSplitTop, const size_t& trpzPrevSplitBot) {
+const std::array<size_t, 2> TrapezoidalMap::split2(const size_t& trpzToReplace, const cg3::Segment2d& segment,
+                                                    const size_t& trpzPrevSplitTop, const size_t& trpzPrevSplitBot) {
     /* Reference of the Trapezoid that needs to be splitted */
     Trapezoid origin = trapezoids[trpzToReplace];
 
@@ -239,9 +242,9 @@ const std::vector<size_t> TrapezoidalMap::split2(const size_t& trpzToReplace, co
         trapezoids[origin.getBotRightNeighbor()].setBotLeftNeighbor(t2Index);
 
     /* Returning the indexes of the edited Trapezoids */
-    std::vector<size_t> createdTrapezoids = std::vector<size_t>();
-    createdTrapezoids.push_back(t1Index);
-    createdTrapezoids.push_back(t2Index);
+    std::array<size_t, 2> createdTrapezoids;
+    createdTrapezoids[0] = t1Index;
+    createdTrapezoids[1] = t2Index;
 
     return createdTrapezoids;
 }
@@ -259,8 +262,8 @@ const std::vector<size_t> TrapezoidalMap::split2(const size_t& trpzToReplace, co
  * @param trpzPrevSplitBot, index of the left neighbor Trapezoid from a previous split (under the segment).
  * @return a Vector containing the 3 indexes of the new Trapezoids
  */
-const std::vector<size_t> TrapezoidalMap::split3R(const size_t& trpzToReplace, const cg3::Segment2d& segment,
-                                                         const size_t& trpzPrevSplitTop, const size_t& trpzPrevSplitBot) {
+const std::array<size_t, 3> TrapezoidalMap::split3R(const size_t& trpzToReplace, const cg3::Segment2d& segment,
+                                                    const size_t& trpzPrevSplitTop, const size_t& trpzPrevSplitBot) {
     /* Reference of the Trapezoid that needs to be splitted */
     Trapezoid origin = trapezoids[trpzToReplace];
 
@@ -305,10 +308,10 @@ const std::vector<size_t> TrapezoidalMap::split3R(const size_t& trpzToReplace, c
         trapezoids[origin.getBotLeftNeighbor()].setBotRightNeighbor(t2Index);
 
     /* Returning the indexes of the edited and created Trapezoids */
-    std::vector<size_t> createdTrapezoids = std::vector<size_t>();
-    createdTrapezoids.push_back(t1Index);
-    createdTrapezoids.push_back(t2Index);
-    createdTrapezoids.push_back(t3Index);
+    std::array<size_t,3 > createdTrapezoids;
+    createdTrapezoids[0] = t1Index;
+    createdTrapezoids[1] = t2Index;
+    createdTrapezoids[2] = t3Index;
 
     return createdTrapezoids;
 }
@@ -322,7 +325,7 @@ const std::vector<size_t> TrapezoidalMap::split3R(const size_t& trpzToReplace, c
  * @param leftTrpzIndex, index of the left Trapezoid to merge
  * @param rightTrpzIndex, index of the right Trapezoid to merge
  */
-void TrapezoidalMap::merge(size_t leftTrpzIndex, size_t rightTrpzIndex) {
+void TrapezoidalMap::merge(const size_t& leftTrpzIndex, const size_t& rightTrpzIndex) {
     Trapezoid t2 = trapezoids[rightTrpzIndex];
 
     /* "Deleting" the right Trapezoid */
@@ -341,18 +344,36 @@ void TrapezoidalMap::merge(size_t leftTrpzIndex, size_t rightTrpzIndex) {
         trapezoids[trapezoids[leftTrpzIndex].getBotRightNeighbor()].setBotLeftNeighbor(leftTrpzIndex);
 }
 
-const std::vector<Trapezoid> TrapezoidalMap::getTrapezoids() const {
-    return trapezoids;
+/**
+ * @brief Returns the number of Trapezoid inside the map.
+ * It is included in the counting the segment
+ * considered as "deleted" after a Merge operation.
+ * @return the number of Trapezoid inside the map.
+ */
+size_t TrapezoidalMap::getTrapezoidalMapSize() const {
+    return trapezoids.size();
 }
 
+/**
+ * @brief Returns the index of the Trapezoid considered as "deleted" after a Merge operation.
+ * Returns SIZE_MAX if no Trapezoid has been deleted yet.
+ * @return thethe index of the Trapezoid considered as "deleted".
+ */
 size_t TrapezoidalMap::getFreeSlotIndex() const {
     return freeSlotIndex;
 }
 
-const Trapezoid TrapezoidalMap::getBoundingBox() const {
+/**
+ * @brief Returns the original Trapezoid considered as BoundingBox.
+ * @return the original Trapezoid.
+ */
+const Trapezoid& TrapezoidalMap::getBoundingBox() const {
     return boundingBox;
 }
 
+/**
+ * @brief Clears the Trapezoidal Map restoring the original Trapezoid.
+ */
 void TrapezoidalMap::clear() {
     trapezoids.clear();
 

@@ -15,21 +15,25 @@ class DAG {
     public:
         DAG();
 
-        DAGnode& getRoot();
-        DAGnode& getNode(const size_t index);
+        const DAGnode& getRoot();
+        const DAGnode& getNode(const size_t& index);
 
-        size_t updateNode(const DAGnode& newNode, const size_t index);
+        size_t updateNode(const DAGnode& newNode, const size_t& index);
 
         size_t addNode(const DAGnode& newNode);
-        size_t addLeftChild(const DAGnode& newNode, const size_t index);
-        size_t addRightChild(const DAGnode& newNode, const size_t index);
+        size_t addLeftChild(const DAGnode& newNode, const size_t& index);
+        size_t addRightChild(const DAGnode& newNode, const size_t& index);
 
-        void split4(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, std::vector<size_t> trpzs);
-        void split3L(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, std::vector<size_t> trpzs);
-        void split3R(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, std::vector<size_t> trpzs);
-        void split2(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, std::vector<size_t> trpzs);
+        void split4(TrapezoidalMap& tm, const cg3::Segment2d& s,
+                    const size_t& nodeToReplace, const std::array<size_t, 4>& trpzs);
+        void split3L(TrapezoidalMap& tm, const cg3::Segment2d& s,
+                     const size_t& nodeToReplace, const std::array<size_t, 3>& trpzs);
+        void split3R(TrapezoidalMap& tm, const cg3::Segment2d& s,
+                     const size_t& nodeToReplace, const std::array<size_t, 3>& trpzs);
+        void split2(TrapezoidalMap& tm, const cg3::Segment2d& s,
+                    const size_t& nodeToReplace, const std::array<size_t, 2>& trpzs);
 
-        size_t clear();
+        void clear();
 };
 
 #endif // DAG_H

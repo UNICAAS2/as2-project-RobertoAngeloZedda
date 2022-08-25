@@ -13,6 +13,8 @@ Trapezoid::Trapezoid() {
     topRightNeighbor = SIZE_MAX;
     botLeftNeighbor = SIZE_MAX;
     botRightNeighbor = SIZE_MAX;
+
+    DAGlink = SIZE_MAX;
 }
 
 /**

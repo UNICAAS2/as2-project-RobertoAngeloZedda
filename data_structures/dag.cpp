@@ -9,7 +9,8 @@ DAG::DAG() { }
  * @brief Getter for the root of the DAG
  * @return the DAGnode as root
  */
-DAGnode& DAG::getRoot() {
+const DAGnode& DAG::getRoot() {
+    assert(nodes.size() > 0);
     return nodes[0];
 }
 
@@ -18,11 +19,9 @@ DAGnode& DAG::getRoot() {
  * @param index, index of the needed DAGnode
  * @return the DAGnode in the index
  */
-DAGnode& DAG::getNode(const size_t index) {
-    if(index >= 0 && index < nodes.size())
-        return nodes[index];
-    else
-        exit(EXIT_FAILURE);
+const DAGnode& DAG::getNode(const size_t& index) {
+    assert(index >= 0 && index < nodes.size());
+    return nodes[index];
 }
 
 /**
@@ -31,12 +30,10 @@ DAGnode& DAG::getNode(const size_t index) {
  * @param index, index of the DAGnode to update
  * @return the index of the updated DAGnode
  */
-size_t DAG::updateNode(const DAGnode& newNode, const size_t index) {
-    if(index >= 0 && index < nodes.size()) {
-        nodes[index] = newNode;
-        return index;
-    }
-    exit(EXIT_FAILURE);
+size_t DAG::updateNode(const DAGnode& newNode, const size_t& index) {
+    assert(index >= 0 && index < nodes.size());
+    nodes[index] = newNode;
+    return index;
 }
 
 /**
@@ -55,14 +52,11 @@ size_t DAG::addNode(const DAGnode& newNode) {
  * @param index, index of the "father" of the new DAGnode
  * @return the index of the added DAGnode
  */
-size_t DAG::addLeftChild(const DAGnode& newNode, const size_t index) {
-    if(index >= 0 && index < nodes.size()) {
-        size_t newIndex = addNode(newNode);
-        nodes[index].setLeft(newIndex);
-        return newIndex;
-    }
-    else
-        exit(EXIT_FAILURE);
+size_t DAG::addLeftChild(const DAGnode& newNode, const size_t& index) {
+    assert(index >= 0 && index < nodes.size());
+    size_t newIndex = addNode(newNode);
+    nodes[index].setLeft(newIndex);
+    return newIndex;
 }
 
 /**
@@ -71,14 +65,11 @@ size_t DAG::addLeftChild(const DAGnode& newNode, const size_t index) {
  * @param index, index of the "father" of the new DAGnode
  * @return the index of the added DAGnode
  */
-size_t DAG::addRightChild(const DAGnode& newNode, const size_t index) {
-    if(index >= 0 && index < nodes.size()) {
-        size_t newIndex = addNode(newNode);
-        nodes[index].setRight(newIndex);
-        return newIndex;
-    }
-    else
-        exit(EXIT_FAILURE);
+size_t DAG::addRightChild(const DAGnode& newNode, const size_t& index) {
+    assert(index >= 0 && index < nodes.size());
+    size_t newIndex = addNode(newNode);
+    nodes[index].setRight(newIndex);
+    return newIndex;
 }
 
 /**
@@ -88,7 +79,8 @@ size_t DAG::addRightChild(const DAGnode& newNode, const size_t index) {
  * @param nodeToReplace, index of the node in which the pattern gotta be attached to
  * @param trpsz, vecotr of indexes of Trapezoid involved in the split
  */
-void DAG::split4(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, std::vector<size_t> trpzs) {
+void DAG::split4(TrapezoidalMap& tm, const cg3::Segment2d& s,
+                 const size_t& nodeToReplace, const std::array<size_t, 4>& trpzs) {
     size_t n1 = updateNode(DAGnode(s.p1()), nodeToReplace);
 
     size_t n2 = addLeftChild(DAGnode(trpzs[0]), n1);
@@ -113,7 +105,8 @@ void DAG::split4(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, std
  * @param nodeToReplace, index of the node in which the pattern gotta be attached to
  * @param trpsz, vecotr of indexes of Trapezoid involved in the split
  */
-void DAG::split3L(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, std::vector<size_t> trpzs) {
+void DAG::split3L(TrapezoidalMap& tm, const cg3::Segment2d& s,
+                  const size_t& nodeToReplace, const std::array<size_t, 3>& trpzs) {
     size_t n1 = updateNode(DAGnode(s.p1()), nodeToReplace);
 
     size_t n2 = addLeftChild(DAGnode(trpzs[0]), n1);
@@ -134,7 +127,8 @@ void DAG::split3L(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, st
  * @param nodeToReplace, index of the node in which the pattern gotta be attached to
  * @param trpsz, vecotr of indexes of Trapezoid involved in the split
  */
-void DAG::split3R(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, std::vector<size_t> trpzs) {
+void DAG::split3R(TrapezoidalMap& tm, const cg3::Segment2d& s,
+                  const size_t& nodeToReplace, const std::array<size_t, 3>& trpzs) {
     size_t n1 = updateNode(DAGnode(s.p2()), nodeToReplace);
 
     size_t n2 = addLeftChild(DAGnode(s), n1);
@@ -145,13 +139,13 @@ void DAG::split3R(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, st
         n4 = addLeftChild(DAGnode(trpzs[0]), n2);
     else {
         n4 = tm.getTrapezoid(trpzs[0]).getDAGlink();
-        getNode(n2).setLeft(n4);
+        nodes[n2].setLeft(n4);
     }
     if(tm.getTrapezoid(trpzs[1]).getDAGlink() == SIZE_MAX)
         n5 = addRightChild(DAGnode(trpzs[1]), n2);
     else {
         n5 = tm.getTrapezoid(trpzs[1]).getDAGlink();
-        getNode(n2).setRight(n5);
+        nodes[n2].setRight(n5);
     }
 
     tm.getTrapezoid(trpzs[0]).setDAGlink(n4);
@@ -166,7 +160,8 @@ void DAG::split3R(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, st
  * @param nodeToReplace, index of the node in which the pattern gotta be attached to
  * @param trpsz, vecotr of indexes of Trapezoid involved in the split
  */
-void DAG::split2(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, std::vector<size_t> trpzs) {
+void DAG::split2(TrapezoidalMap& tm, const cg3::Segment2d& s,
+                 const size_t& nodeToReplace, const std::array<size_t, 2>& trpzs) {
     size_t n1 = updateNode(DAGnode(s), nodeToReplace);
 
     size_t n2 = tm.getTrapezoid(trpzs[0]).getDAGlink();
@@ -175,21 +170,22 @@ void DAG::split2(TrapezoidalMap& tm, cg3::Segment2d s, size_t nodeToReplace, std
         n2 = addLeftChild(DAGnode(trpzs[0]), n1);
     else {
         n2 = tm.getTrapezoid(trpzs[0]).getDAGlink();
-        getNode(n1).setLeft(n2);
+        nodes[n1].setLeft(n2);
     }
     if(tm.getTrapezoid(trpzs[1]).getDAGlink() == SIZE_MAX)
         n3 = addRightChild(DAGnode(trpzs[1]), n1);
     else {
         n3 = tm.getTrapezoid(trpzs[1]).getDAGlink();
-        getNode(n1).setRight(n3);
+        nodes[n1].setRight(n3);
     }
 
     tm.getTrapezoid(trpzs[0]).setDAGlink(n2);
     tm.getTrapezoid(trpzs[1]).setDAGlink(n3);
 }
 
-size_t DAG::clear() {
+/**
+ * @brief Clears the DAG.
+ */
+void DAG::clear() {
     nodes.clear();
-    size_t i = addNode(0);
-    return i;
 }

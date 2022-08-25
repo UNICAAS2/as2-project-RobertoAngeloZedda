@@ -83,12 +83,9 @@ TrapezoidalMapManager::TrapezoidalMapManager(QWidget *parent) :
     //and re-drawing it again. See how we implemented the drawing of the bounding box and 
     //the dataset.
 
-
-
+    dag.addNode(DAGnode(0));
 
     //#####################################################################
-
-    dag.addNode(DAGnode(0));
 
     mainWindow.pushDrawableObject(&dtm, "Trapezoidal Map");
 
@@ -198,15 +195,12 @@ void TrapezoidalMapManager::addSegmentToTrapezoidalMap(const cg3::Segment2d& seg
     //it more efficient in memory. However, depending on how you implement your algorithms and data 
     //structures, you could save directly the point (Point2d) in each trapezoid (it is fine).
 
-
-
-
-    //#####################################################################
-
     cg3::Segment2d fixedSegment = Algorithms::fixSegmentDirection(segment);
     std::vector<size_t> trapezoids = Algorithms::followSegment(fixedSegment, dag, dtm);
     Algorithms::updateTrapezoidalMapAndDAG(fixedSegment, trapezoids, dag, dtm);
     dtm.updateColors();
+
+    //#####################################################################
 
     //You can delete this line after you implement the algorithm: it is
     //just needed to suppress the unused-variable warning
@@ -259,7 +253,6 @@ void TrapezoidalMapManager::queryTrapezoidalMap(const cg3::Point2d& queryPoint)
 
     dtm.setSelectedTrapezoid(Algorithms::findPoint(queryPoint, dag, queryPoint));
 
-
     //#####################################################################
 
 
@@ -278,7 +271,9 @@ void TrapezoidalMapManager::clearTrapezoidalMap()
     //Clear here your trapezoidal map data structure.
 
     dtm.clear();
+
     dag.clear();
+    dag.addNode(DAGnode(0));
 
     //#####################################################################
 }

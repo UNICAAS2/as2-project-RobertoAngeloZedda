@@ -17,7 +17,7 @@ DAGnode::DAGnode(const cg3::Point2d& p) {
  * @param l, index of the left sub-tree inside the DAG
  * @param r, index of the right sub-tree inside the DAG
  */
-DAGnode::DAGnode(const cg3::Point2d& p, const size_t l, const size_t r) {
+DAGnode::DAGnode(const cg3::Point2d& p, const size_t& l, const size_t& r) {
     type = point;
     pointValue = p;
     left = l;
@@ -41,7 +41,7 @@ DAGnode::DAGnode(const cg3::Segment2d& s) {
  * @param l, index of the left sub-tree inside the DAG
  * @param r, index of the right sub-tree inside the DAG
  */
-DAGnode::DAGnode(const cg3::Segment2d& s, const size_t l, const size_t r) {
+DAGnode::DAGnode(const cg3::Segment2d& s, const size_t& l, const size_t& r) {
     type = segment;
     segmentValue = s;
     left = l;
@@ -52,7 +52,7 @@ DAGnode::DAGnode(const cg3::Segment2d& s, const size_t l, const size_t r) {
  * @brief DAGnode Constructor for the "trapezoid" node type
  * @param t, the index of the Trapezoid inside the TrapezoidalMap which will be store as value
  */
-DAGnode::DAGnode(const size_t t) {
+DAGnode::DAGnode(const size_t& t) {
     type = trapezoid;
     trapezoidValue = t;
     left = SIZE_MAX;
@@ -65,7 +65,7 @@ DAGnode::DAGnode(const size_t t) {
  * @param l, index of the left sub-tree inside the DAG
  * @param r, index of the right sub-tree inside the DAG
  */
-DAGnode::DAGnode(const size_t t, const size_t l, const size_t r) {
+DAGnode::DAGnode(const size_t& t, const size_t& l, const size_t& r) {
     type = trapezoid;
     trapezoidValue = t;
     left = l;
@@ -76,13 +76,13 @@ DAGnode::DAGnode(const size_t t, const size_t l, const size_t r) {
  * @brief Setter for the left sub-tree
  * @param leftNode, the new DAGnode index
  */
-void DAGnode::setLeft(const size_t leftNode) { left = leftNode; }
+void DAGnode::setLeft(const size_t& leftNode) { left = leftNode; }
 
 /**
  * @brief Setter for the right sub-tree
  * @param rightNode, the new DAGnode index
  */
-void DAGnode::setRight(const size_t rightNode) { right = rightNode; }
+void DAGnode::setRight(const size_t& rightNode) { right = rightNode; }
 
 /**
  * @brief Getter for the left sub-tree DAGnode index
@@ -118,22 +118,18 @@ bool DAGnode::isTrapezoidNode() const { return (type == trapezoid); }
  * @brief Getter DAGnode value of a Point type node
  * @return the pointValue
  */
-const cg3::Point2d DAGnode::getPointValue() const {
-    if(type == point)
-        return pointValue;
-    else
-        exit(EXIT_FAILURE);
+const cg3::Point2d& DAGnode::getPointValue() const {
+    assert(type == point);
+    return pointValue;
 }
 
 /**
  * @brief Getter DAGnode value of a Segment type node
  * @return the segmentValue
  */
-const cg3::Segment2d DAGnode::getSegmentValue() const {
-    if(type == segment)
-        return segmentValue;
-    else
-        exit(EXIT_FAILURE);
+const cg3::Segment2d& DAGnode::getSegmentValue() const {
+    assert(type == segment);
+    return segmentValue;
 }
 
 /**
@@ -141,8 +137,6 @@ const cg3::Segment2d DAGnode::getSegmentValue() const {
  * @return the trapezoidValue
  */
 size_t DAGnode::getTrapezoidValue() const {
-    if(type == trapezoid)
-        return trapezoidValue;
-    else
-        exit(EXIT_FAILURE);
+    assert(type == trapezoid);
+    return trapezoidValue;
 }

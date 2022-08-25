@@ -78,13 +78,14 @@ namespace Algorithms {
      * @param tm, the Trapezoidal Map
      */
     void updateTrapezoidalMapAndDAG(const cg3::Segment2d& segment, std::vector<size_t>& trapezoids, DAG& dag, TrapezoidalMap& tm) {
-        /* Set of trapezoids (indexes) as result of a split operation */
-        std::vector<size_t> newTrpz;
-
-        /* A reference to the Trapezoid that is being replaced
-         * is needed to know in which direction to merge
+        /* A reference to the Trapezoid that is being replaced,
+         * It is needed to know in which direction to merge
          * and to perform the update of the DAG */
         Trapezoid replacedTrapezoid;
+
+        std::array<size_t, 2> newTrapezoids2;
+        std::array<size_t, 3> newTrapezoids3;
+        std::array<size_t, 4> newTrapezoids4;
 
         /* If the new Segment is contained inside a single Trapezoid */
         if(trapezoids.size() == 1) {
@@ -92,21 +93,21 @@ namespace Algorithms {
 
             if(replacedTrapezoid.getLeftP() == segment.p1()) {
                 if(replacedTrapezoid.getRightP() == segment.p2()) {
-                    newTrpz = tm.split2(trapezoids[0], segment, SIZE_MAX, SIZE_MAX);
-                    dag.split2(tm, segment, replacedTrapezoid.getDAGlink(), newTrpz);
+                    newTrapezoids2 = tm.split2(trapezoids[0], segment, SIZE_MAX, SIZE_MAX);
+                    dag.split2(tm, segment, replacedTrapezoid.getDAGlink(), newTrapezoids2);
                 }
                 else {
-                    newTrpz = tm.split3R(trapezoids[0], segment, SIZE_MAX, SIZE_MAX);
-                    dag.split3R(tm, segment, replacedTrapezoid.getDAGlink(), newTrpz);
+                    newTrapezoids3 = tm.split3R(trapezoids[0], segment, SIZE_MAX, SIZE_MAX);
+                    dag.split3R(tm, segment, replacedTrapezoid.getDAGlink(), newTrapezoids3);
                 }
             }
             else if (replacedTrapezoid.getRightP() == segment.p2()) {
-                newTrpz = tm.split3L(trapezoids[0], segment);
-                dag.split3L(tm, segment, replacedTrapezoid.getDAGlink(), newTrpz);
+                newTrapezoids3 = tm.split3L(trapezoids[0], segment);
+                dag.split3L(tm, segment, replacedTrapezoid.getDAGlink(), newTrapezoids3);
             }
             else {
-                newTrpz = tm.split4(trapezoids[0], segment);
-                dag.split4(tm, segment, replacedTrapezoid.getDAGlink(), newTrpz);
+                newTrapezoids4 = tm.split4(trapezoids[0], segment);
+                dag.split4(tm, segment, replacedTrapezoid.getDAGlink(), newTrapezoids4);
             }
         } else {
         /* If the new Segment is contained inside multiple Trapezoids */
@@ -114,17 +115,29 @@ namespace Algorithms {
             /* Handling first Trapezoid*/
             replacedTrapezoid = tm.getTrapezoid(trapezoids[0]);
 
+            /* References for merging and setting neighbors */
+            size_t trapezoidFromPrevSplitTop;
+            size_t trapezoidFromPrevSplitBot;
+
             if (replacedTrapezoid.getLeftP() == segment.p1()) {
-                newTrpz = tm.split2(trapezoids[0], segment, SIZE_MAX, SIZE_MAX);
-                dag.split2(tm, segment, replacedTrapezoid.getDAGlink(), newTrpz);
+                newTrapezoids2 = tm.split2(trapezoids[0], segment, SIZE_MAX, SIZE_MAX);
+
+                dag.split2(tm, segment, replacedTrapezoid.getDAGlink(), newTrapezoids2);
+
+                trapezoidFromPrevSplitTop = newTrapezoids2[0];
+                trapezoidFromPrevSplitBot = newTrapezoids2[1];
             }
             else {
-                newTrpz = tm.split3L(trapezoids[0], segment);
-                dag.split3L(tm, segment, replacedTrapezoid.getDAGlink(), newTrpz);
+                newTrapezoids3 = tm.split3L(trapezoids[0], segment);
+
+                dag.split3L(tm, segment, replacedTrapezoid.getDAGlink(), newTrapezoids3);
+
+                trapezoidFromPrevSplitTop = newTrapezoids3[1];
+                trapezoidFromPrevSplitBot = newTrapezoids3[2];
             }
 
             bool mergeFlag;
-            size_t trpzToMerge;
+            size_t trapezoidToMerge;
 
             /* Handling Trapezoid not in first nor in last position */
             for(size_t i=1; i<=trapezoids.size()-2; i++) {
@@ -133,20 +146,23 @@ namespace Algorithms {
 
                 replacedTrapezoid = tm.getTrapezoid(trapezoids[i]);
 
-                newTrpz = tm.split2(trapezoids[i], segment, newTrpz[newTrpz.size()-2], newTrpz[newTrpz.size()-1]);
+                newTrapezoids2 = tm.split2(trapezoids[i], segment, trapezoidFromPrevSplitTop, trapezoidFromPrevSplitBot);
 
                 if(mergeFlag) {
-                    trpzToMerge = tm.getTrapezoid(newTrpz[0]).getBotLeftNeighbor();
-                    tm.merge(trpzToMerge, newTrpz[0]);
-                    newTrpz[0] = trpzToMerge;
+                    trapezoidToMerge = tm.getTrapezoid(newTrapezoids2[0]).getBotLeftNeighbor();
+                    tm.merge(trapezoidToMerge, newTrapezoids2[0]);
+                    newTrapezoids2[0] = trapezoidToMerge;
                 }
                 else {
-                    trpzToMerge = tm.getTrapezoid(newTrpz[1]).getTopLeftNeighbor();
-                    tm.merge(trpzToMerge, newTrpz[1]);
-                    newTrpz[1] = trpzToMerge;
+                    trapezoidToMerge = tm.getTrapezoid(newTrapezoids2[1]).getTopLeftNeighbor();
+                    tm.merge(trapezoidToMerge, newTrapezoids2[1]);
+                    newTrapezoids2[1] = trapezoidToMerge;
                 }
 
-                dag.split2(tm, segment, replacedTrapezoid.getDAGlink(), newTrpz);
+                dag.split2(tm, segment, replacedTrapezoid.getDAGlink(), newTrapezoids2);
+
+                trapezoidFromPrevSplitTop = newTrapezoids2[0];
+                trapezoidFromPrevSplitBot = newTrapezoids2[1];
             }
 
             /* Handling the last Trapezoid */
@@ -154,26 +170,39 @@ namespace Algorithms {
 
             replacedTrapezoid = tm.getTrapezoid(trapezoids[trapezoids.size()-1]);
 
-            if(replacedTrapezoid.getRightP() == segment.p2())
-                newTrpz = tm.split2(trapezoids[trapezoids.size()-1], segment, newTrpz[newTrpz.size()-2], newTrpz[newTrpz.size()-1]);
-            else
-                newTrpz = tm.split3R(trapezoids[trapezoids.size()-1], segment, newTrpz[newTrpz.size()-2], newTrpz[newTrpz.size()-1]);
+            if(replacedTrapezoid.getRightP() == segment.p2()) {
+                newTrapezoids2 = tm.split2(trapezoids[trapezoids.size()-1], segment,
+                                           trapezoidFromPrevSplitTop, trapezoidFromPrevSplitBot);
 
-            if(mergeFlag) {
-                trpzToMerge = tm.getTrapezoid(newTrpz[0]).getBotLeftNeighbor();
-                tm.merge(trpzToMerge, newTrpz[0]);
-                newTrpz[0] = trpzToMerge;
-            }
-            else {
-                trpzToMerge = tm.getTrapezoid(newTrpz[1]).getTopLeftNeighbor();
-                tm.merge(trpzToMerge, newTrpz[1]);
-                newTrpz[1] = trpzToMerge;
-            }
+                if(mergeFlag) {
+                    trapezoidToMerge = tm.getTrapezoid(newTrapezoids2[0]).getBotLeftNeighbor();
+                    tm.merge(trapezoidToMerge, newTrapezoids2[0]);
+                    newTrapezoids2[0] = trapezoidToMerge;
+                }
+                else {
+                    trapezoidToMerge = tm.getTrapezoid(newTrapezoids2[1]).getTopLeftNeighbor();
+                    tm.merge(trapezoidToMerge, newTrapezoids2[1]);
+                    newTrapezoids2[1] = trapezoidToMerge;
+                }
 
-            if(replacedTrapezoid.getRightP() == segment.p2())
-                dag.split2(tm, segment, replacedTrapezoid.getDAGlink(), newTrpz);
-            else
-                dag.split3R(tm, segment, replacedTrapezoid.getDAGlink(), newTrpz);
+                dag.split2(tm, segment, replacedTrapezoid.getDAGlink(), newTrapezoids2);
+            } else {
+                newTrapezoids3 = tm.split3R(trapezoids[trapezoids.size()-1], segment,
+                                      trapezoidFromPrevSplitTop, trapezoidFromPrevSplitBot);
+
+                if(mergeFlag) {
+                    trapezoidToMerge = tm.getTrapezoid(newTrapezoids3[0]).getBotLeftNeighbor();
+                    tm.merge(trapezoidToMerge, newTrapezoids3[0]);
+                    newTrapezoids3[0] = trapezoidToMerge;
+                }
+                else {
+                    trapezoidToMerge = tm.getTrapezoid(newTrapezoids3[1]).getTopLeftNeighbor();
+                    tm.merge(trapezoidToMerge, newTrapezoids3[1]);
+                    newTrapezoids3[1] = trapezoidToMerge;
+                }
+
+                dag.split3R(tm, segment, replacedTrapezoid.getDAGlink(), newTrapezoids3);
+            }
         }
     }
 }
