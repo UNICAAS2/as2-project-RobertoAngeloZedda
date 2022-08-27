@@ -121,8 +121,7 @@ TrapezoidalMapManager::~TrapezoidalMapManager()
     //Try to AVOID using dynamic objects whenever it is possible (it will
     //be evaluated!)
 
-
-
+    mainWindow.deleteDrawableObject(&dtm);
 
     //#####################################################################
 
@@ -198,7 +197,7 @@ void TrapezoidalMapManager::addSegmentToTrapezoidalMap(const cg3::Segment2d& seg
     cg3::Segment2d fixedSegment = Algorithms::fixSegmentDirection(segment);
     std::vector<size_t> trapezoids = Algorithms::followSegment(fixedSegment, dag, dtm);
     Algorithms::updateTrapezoidalMapAndDAG(fixedSegment, trapezoids, dag, dtm);
-    dtm.updateColors();
+    //dtm.updateColors();
 
     //#####################################################################
 

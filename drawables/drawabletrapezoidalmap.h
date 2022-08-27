@@ -2,24 +2,19 @@
 #define DRAWABLETRAPEZOIDALMAP_H
 
 #include "data_structures/trapezoidalmap.h"
+#include "drawables/drawabletrapezoid.h"
 #include <cg3/viewer/interfaces/drawable_object.h>
-#include <cg3/utilities/color.h>
 #include <cg3/viewer/opengl_objects/opengl_objects2.h>
 #include <cg3/geometry/bounding_box2.h>
-#include <cstdlib>
-#include <ctime>
 
 class DrawableTrapezoidalMap : public TrapezoidalMap, public cg3::DrawableObject
 {
     private:
-        std::vector<cg3::Color> colors;
+        std::vector<DrawableTrapezoid> drawableTrapezoids;
         size_t selectedTrapezoid;
 
         const cg3::Color selectedTrapezoidColor;
         const cg3::Color segmentColor;
-
-        const cg3::Color randomColor() const;
-        const cg3::Point2d calculateIntersection(const cg3::Segment2d& s, const double& x) const;
     public:
         DrawableTrapezoidalMap(const cg3::Point2d& botLeft, const cg3::Point2d& topRight);
 
@@ -29,7 +24,14 @@ class DrawableTrapezoidalMap : public TrapezoidalMap, public cg3::DrawableObject
 
         void setSelectedTrapezoid(size_t index);
 
-        void updateColors(); //
+        const std::array<size_t, 4> split4(const size_t& trpzToReplace, const cg3::Segment2d& segment);
+        const std::array<size_t, 3> split3L(const size_t& trpzToReplace, const cg3::Segment2d& segment);
+        const std::array<size_t, 2> split2(const size_t& trpzToReplace, const cg3::Segment2d& segment,
+                                         const size_t& trpzPrevSplitTop, const size_t& trpzPrevSplitBot);
+        const std::array<size_t, 3> split3R(const size_t& trpzToReplace, const cg3::Segment2d& segment,
+                                          const size_t& trpzPrevSplitTop, const size_t& trpzPrevSplitBot);
+
+        void merge(const size_t& leftTrpzIndex, const size_t& rightTrpzIndex);
 
         void clear();
 };

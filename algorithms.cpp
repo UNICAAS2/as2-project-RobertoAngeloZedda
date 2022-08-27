@@ -75,9 +75,9 @@ namespace Algorithms {
      * @param segment, the added Segment
      * @param trapezoids, a Vector containing the indexes of the Trapezoids crossed by the Segement (from left to right)
      * @param dag, the DAG
-     * @param tm, the Trapezoidal Map
+     * @param tm, the Drawable Trapezoidal Map (to also update the drawable versione of the trapezoid)
      */
-    void updateTrapezoidalMapAndDAG(const cg3::Segment2d& segment, std::vector<size_t>& trapezoids, DAG& dag, TrapezoidalMap& tm) {
+    void updateTrapezoidalMapAndDAG(const cg3::Segment2d& segment, std::vector<size_t>& trapezoids, DAG& dag, DrawableTrapezoidalMap& tm) {
         /* A reference to the Trapezoid that is being replaced,
          * It is needed to know in which direction to merge
          * and to perform the update of the DAG */

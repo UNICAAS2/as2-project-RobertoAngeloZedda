@@ -76,7 +76,7 @@ const Trapezoid& TrapezoidalMap::getTrapezoid(const size_t& index) const {
  * All the neighbors will also be updated.
  * @param trpzToReplace, index of the Trapezoid to replace
  * @param segment, Segment to compute the spit around
- * @return a Vector containing the 4 indexes of the new Trapezoids
+ * @return an Array containing the 4 indexes of the new Trapezoids
  */
 const std::array<size_t, 4> TrapezoidalMap::split4(const size_t& trpzToReplace, const cg3::Segment2d& segment) {
     /* Reference of the Trapezoid that needs to be splitted */
@@ -142,7 +142,7 @@ const std::array<size_t, 4> TrapezoidalMap::split4(const size_t& trpzToReplace, 
  * The neighbors will also be updated.
  * @param trpzToReplace, index of the Trapezoid to replace
  * @param segment, Segment to compute the spit around
- * @return a Vector containing the 3 indexes of the new Trapezoids
+ * @return an Array containing the 3 indexes of the new Trapezoids
  */
 const std::array<size_t, 3> TrapezoidalMap::split3L(const size_t& trpzToReplace, const cg3::Segment2d& segment) {
     /* Reference of the Trapezoid that needs to be splitted */
@@ -201,7 +201,7 @@ const std::array<size_t, 3> TrapezoidalMap::split3L(const size_t& trpzToReplace,
  * @param segment, Segment to compute the spit around
  * @param trpzPrevSplitTop, index of the left neighbor Trapezoid from a previous split (above the segment).
  * @param trpzPrevSplitBot, index of the left neighbor Trapezoid from a previous split (under the segment).
- * @return a Vector containing the 3 indexes of the new Trapezoids
+ * @return an Array containing the 3 indexes of the new Trapezoids
  */
 const std::array<size_t, 2> TrapezoidalMap::split2(const size_t& trpzToReplace, const cg3::Segment2d& segment,
                                                     const size_t& trpzPrevSplitTop, const size_t& trpzPrevSplitBot) {
@@ -260,7 +260,7 @@ const std::array<size_t, 2> TrapezoidalMap::split2(const size_t& trpzToReplace, 
  * @param segment, Segment to compute the spit around
  * @param trpzPrevSplitTop, index of the left neighbor Trapezoid from a previous split (above the segment).
  * @param trpzPrevSplitBot, index of the left neighbor Trapezoid from a previous split (under the segment).
- * @return a Vector containing the 3 indexes of the new Trapezoids
+ * @return an Array containing the 3 indexes of the new Trapezoids
  */
 const std::array<size_t, 3> TrapezoidalMap::split3R(const size_t& trpzToReplace, const cg3::Segment2d& segment,
                                                     const size_t& trpzPrevSplitTop, const size_t& trpzPrevSplitBot) {
