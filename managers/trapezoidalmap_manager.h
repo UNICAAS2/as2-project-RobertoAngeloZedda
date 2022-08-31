@@ -12,9 +12,7 @@
 
 #include "drawables/drawable_trapezoidalmap_dataset.h"
 
-#include "drawables/drawabletrapezoidalmap.h"
-#include "data_structures/dag.h"
-#include "algorithms.h"
+#include "algorithms/algorithms.h"
 
 namespace Ui {
     class TrapezoidalMapManager;

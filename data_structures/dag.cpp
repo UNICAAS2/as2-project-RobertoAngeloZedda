@@ -184,6 +184,41 @@ void DAG::split2(TrapezoidalMap& tm, const cg3::Segment2d& s,
 }
 
 /**
+ * @brief Finds the Trapezoid containing a given Point
+ * @param point, the Point
+ * @param dag, the DAG
+ * @param point2, the second Point used in case the first one overlaps with one already used
+ * @return returns the index (inside the TrapezoidalMap) of the Trapezoid containing the Point.
+ */
+size_t DAG::findPoint(const cg3::Point2d& point, const cg3::Point2d& point2) {
+    DAGnode currentNode = getRoot();
+
+    while(!currentNode.isTrapezoidNode()) {
+        if(currentNode.isPointNode()) {
+            if(point.x() < currentNode.getPointValue().x())
+                currentNode = getNode(currentNode.getLeft());
+            else
+                currentNode = getNode(currentNode.getRight());
+        }
+        if(currentNode.isSegmentNode()) {
+            if(point != currentNode.getSegmentValue().p1()) {
+                if(Utils::isPointOnTheRight(currentNode.getSegmentValue(), point))
+                    currentNode = getNode(currentNode.getLeft());
+                else
+                    currentNode = getNode(currentNode.getRight());
+            } else {
+                if(Utils::isPointOnTheRight(currentNode.getSegmentValue(), point2))
+                    currentNode = getNode(currentNode.getLeft());
+                else
+                    currentNode = getNode(currentNode.getRight());
+            }
+        }
+    }
+
+    return currentNode.getTrapezoidValue();
+}
+
+/**
  * @brief Clears the DAG.
  */
 void DAG::clear() {

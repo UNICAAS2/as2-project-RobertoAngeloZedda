@@ -2,8 +2,8 @@
 #define DAG_H
 
 #import "dagnode.h"
-
 #import "trapezoidalmap.h"
+#import "utils/utils.h"
 
 /**
  * @brief The DAG class.
@@ -32,6 +32,8 @@ class DAG {
                      const size_t& nodeToReplace, const std::array<size_t, 3>& trpzs);
         void split2(TrapezoidalMap& tm, const cg3::Segment2d& s,
                     const size_t& nodeToReplace, const std::array<size_t, 2>& trpzs);
+
+        size_t findPoint(const cg3::Point2d& point, const cg3::Point2d& point2);
 
         void clear();
 };

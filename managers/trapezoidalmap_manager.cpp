@@ -194,7 +194,7 @@ void TrapezoidalMapManager::addSegmentToTrapezoidalMap(const cg3::Segment2d& seg
     //it more efficient in memory. However, depending on how you implement your algorithms and data 
     //structures, you could save directly the point (Point2d) in each trapezoid (it is fine).
 
-    cg3::Segment2d fixedSegment = Algorithms::fixSegmentDirection(segment);
+    cg3::Segment2d fixedSegment = Utils::fixSegmentDirection(segment);
     std::vector<size_t> trapezoids = Algorithms::followSegment(fixedSegment, dag, dtm);
     Algorithms::updateTrapezoidalMapAndDAG(fixedSegment, trapezoids, dag, dtm);
     //dtm.updateColors();
@@ -250,7 +250,7 @@ void TrapezoidalMapManager::queryTrapezoidalMap(const cg3::Point2d& queryPoint)
     //the output trapezoid in the canvas (DrawableTrapezoidMap should implement the method
     //to do that).
 
-    dtm.setSelectedTrapezoid(Algorithms::findPoint(queryPoint, dag, queryPoint));
+    dtm.setSelectedTrapezoid(dag.findPoint(queryPoint, queryPoint));
 
     //#####################################################################
 

@@ -1,6 +1,6 @@
 #include "utils.h"
 
-namespace Algorithms {
+namespace Utils {
     /**
      * @brief Calculates if a given Point is on the right of a given Segment
      * @param s, the Segment

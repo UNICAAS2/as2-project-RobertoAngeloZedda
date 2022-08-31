@@ -10,10 +10,25 @@
  * @param t, Trapezoid the DrawableTrapezoid is constructed from.
  */
 DrawableTrapezoid::DrawableTrapezoid(Trapezoid& t) {
-    topLeft = calculateIntersection(t.getTop(), t.getLeftP().x());
-    topRight = calculateIntersection(t.getTop(), t.getRightP().x());;
-    botRight = calculateIntersection(t.getBot(), t.getRightP().x());;
-    botLeft = calculateIntersection(t.getBot(), t.getLeftP().x());;
+    if(t.getTop().p1() != t.getLeftP())
+        topLeft = calculateIntersection(t.getTop(), t.getLeftP().x());
+    else
+        topLeft = t.getLeftP();
+
+    if(t.getTop().p2() != t.getRightP())
+        topRight = calculateIntersection(t.getTop(), t.getRightP().x());
+    else
+        topRight = t.getRightP();
+
+    if(t.getBot().p2() != t.getRightP())
+        botRight = calculateIntersection(t.getBot(), t.getRightP().x());
+    else
+        botRight = t.getRightP();
+
+    if(t.getBot().p1() != t.getLeftP())
+        botLeft = calculateIntersection(t.getBot(), t.getLeftP().x());
+    else
+        botLeft = t.getLeftP();
 
     color = randomColor();
 }

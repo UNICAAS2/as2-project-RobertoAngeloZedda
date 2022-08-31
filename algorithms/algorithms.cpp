@@ -2,41 +2,6 @@
 
 namespace Algorithms {
     /**
-     * @brief Finds the Trapezoid containing a Point using the DAG
-     * @param point, the Point
-     * @param dag, the DAG
-     * @param point2, the second Point used in case the first one overlaps with one already used
-     * @return returns the index (inside the TrapezoidalMap) of the Trapezoid containing the Point.
-     */
-    size_t findPoint(const cg3::Point2d& point, DAG& dag, const cg3::Point2d& point2) {
-        DAGnode currentNode = dag.getRoot();
-
-        while(!currentNode.isTrapezoidNode()) {
-            if(currentNode.isPointNode()) {
-                if(point.x() < currentNode.getPointValue().x())
-                    currentNode = dag.getNode(currentNode.getLeft());
-                else
-                    currentNode = dag.getNode(currentNode.getRight());
-            }
-            if(currentNode.isSegmentNode()) {
-                if(point != currentNode.getSegmentValue().p1()) {
-                    if(isPointOnTheRight(currentNode.getSegmentValue(), point))
-                        currentNode = dag.getNode(currentNode.getLeft());
-                    else
-                        currentNode = dag.getNode(currentNode.getRight());
-                } else {
-                    if(isPointOnTheRight(currentNode.getSegmentValue(), point2))
-                        currentNode = dag.getNode(currentNode.getLeft());
-                    else
-                        currentNode = dag.getNode(currentNode.getRight());
-                }
-            }
-        }
-
-        return currentNode.getTrapezoidValue();
-    }
-
-    /**
      * @brief finds all the Trapzeoids in which a Segment lies.
      * @param segment, the Segment
      * @param dag, the DAG
@@ -48,7 +13,7 @@ namespace Algorithms {
 
         cg3::Point2d firstPoint = segment.p1();
         cg3::Point2d secondPoint = segment.p2();
-        trapezoids.push_back(Algorithms::findPoint(firstPoint, dag, secondPoint));
+        trapezoids.push_back(dag.findPoint(firstPoint, secondPoint));
 
         /* As long as the Trapezoid we are analyzing does not contain
          * the right endpoint of the Segment
@@ -60,7 +25,7 @@ namespace Algorithms {
          *          the TOP-right neighbor can be added to the Vector */
         int j = 0;
         while(segment.p2().x() > tm.getTrapezoid(trapezoids[j]).getRightP().x()) {
-            if(isPointOnTheRight(segment ,tm.getTrapezoid(trapezoids[j]).getRightP()))
+            if(Utils::isPointOnTheRight(segment ,tm.getTrapezoid(trapezoids[j]).getRightP()))
                 trapezoids.push_back(tm.getTrapezoid(trapezoids[j]).getBotRightNeighbor());
             else
                 trapezoids.push_back(tm.getTrapezoid(trapezoids[j]).getTopRightNeighbor());
