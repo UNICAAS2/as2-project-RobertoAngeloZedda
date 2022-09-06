@@ -18,14 +18,14 @@ namespace Algorithms {
         /* As long as the Trapezoid we are analyzing does not contain
          * the right endpoint of the Segment
          *      if the rightmost point of the Trapezoid lies
-         *      on the RIGHT of the Segment
+         *      on the LEFT of the Segment
          *          the BOT-right neighbor can be added to the Vector
          *      if the rightmost point of the Trapezoid lies
-         *      on the LEFT of the Segment
+         *      on the RIGHT of the Segment
          *          the TOP-right neighbor can be added to the Vector */
         int j = 0;
         while(segment.p2().x() > tm.getTrapezoid(trapezoids[j]).getRightP().x()) {
-            if(Utils::isPointOnTheRight(segment ,tm.getTrapezoid(trapezoids[j]).getRightP()))
+            if(Utils::isPointOnTheLeft(segment ,tm.getTrapezoid(trapezoids[j]).getRightP()))
                 trapezoids.push_back(tm.getTrapezoid(trapezoids[j]).getBotRightNeighbor());
             else
                 trapezoids.push_back(tm.getTrapezoid(trapezoids[j]).getTopRightNeighbor());
@@ -104,7 +104,7 @@ namespace Algorithms {
             bool mergeFlag;
             size_t trapezoidToMerge;
 
-            /* Handling Trapezoid not in first nor in last position */
+            /* Handling Trapezoids not in first nor in last position */
             for(size_t i=1; i<=trapezoids.size()-2; i++) {
 
                 mergeFlag = replacedTrapezoid.getTopRightNeighbor() == trapezoids[i];

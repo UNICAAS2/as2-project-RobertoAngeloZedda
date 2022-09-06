@@ -2,12 +2,12 @@
 
 namespace Utils {
     /**
-     * @brief Calculates if a given Point is on the right of a given Segment
+     * @brief Calculates if a given Point is on the left of a given Segment
      * @param s, the Segment
      * @param p, the Point
-     * @return true if p is on the right of s, false otherwise
+     * @return true if p is on the left of s, false otherwise
     */
-    bool isPointOnTheRight(const cg3::Segment2d& s, const cg3::Point2d& p) {
+    bool isPointOnTheLeft(const cg3::Segment2d& s, const cg3::Point2d& p) {
         float det = s.p1().x() * (s.p2().y() - p.y()) -
                     s.p1().y() * (s.p2().x() - p.x()) +
                     s.p2().x() * p.y() - p.x() * s.p2().y();

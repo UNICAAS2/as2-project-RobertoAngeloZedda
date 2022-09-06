@@ -202,12 +202,12 @@ size_t DAG::findPoint(const cg3::Point2d& point, const cg3::Point2d& point2) {
         }
         if(currentNode.isSegmentNode()) {
             if(point != currentNode.getSegmentValue().p1()) {
-                if(Utils::isPointOnTheRight(currentNode.getSegmentValue(), point))
+                if(Utils::isPointOnTheLeft(currentNode.getSegmentValue(), point))
                     currentNode = getNode(currentNode.getLeft());
                 else
                     currentNode = getNode(currentNode.getRight());
             } else {
-                if(Utils::isPointOnTheRight(currentNode.getSegmentValue(), point2))
+                if(Utils::isPointOnTheLeft(currentNode.getSegmentValue(), point2))
                     currentNode = getNode(currentNode.getLeft());
                 else
                     currentNode = getNode(currentNode.getRight());
